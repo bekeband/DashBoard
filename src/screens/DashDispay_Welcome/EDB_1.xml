@@ -1,0 +1,20 @@
+<golproperties golId="4" golType="EDB">
+<scheme>defscheme</scheme>
+<charmax>16</charmax>
+<text>EditBox</text>
+<state>
+<list>0</list>
+<list>enabled</list>
+<list>disabled</list>
+</state>
+<visible>
+<list>0</list>
+<list>true</list>
+<list>false</list>
+</visible>
+<bottom>78</bottom>
+<right>272</right>
+<top>29</top>
+<left>46</left>
+<name>EDB_1</name>
+</golproperties>

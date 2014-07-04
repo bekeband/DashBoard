@@ -1,0 +1,24 @@
+<golproperties golId="2" golType="CHB">
+<scheme>gentium8</scheme>
+<text>CheckBox</text>
+<state>
+<list>0</list>
+<list>enabled</list>
+<list>disabled</list>
+</state>
+<checked>
+<list>0</list>
+<list>true</list>
+<list>false</list>
+</checked>
+<visible>
+<list>0</list>
+<list>true</list>
+<list>false</list>
+</visible>
+<bottom>154</bottom>
+<right>249</right>
+<top>64</top>
+<left>47</left>
+<name>CHB_1</name>
+</golproperties>

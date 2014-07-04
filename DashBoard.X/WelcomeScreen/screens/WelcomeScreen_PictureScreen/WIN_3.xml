@@ -1,0 +1,16 @@
+<golproperties golId="1" golType="WIN">
+<scheme>defscheme</scheme>
+<text>Picture</text>
+<bitmap memory="Internal">bekeband_kicsi.bmp</bitmap>
+<state>
+<list>0</list>
+<list>enabled</list>
+<list>disabled</list>
+</state>
+<visible>
+<list>0</list>
+<list>true</list>
+<list>false</list>
+</visible>
+<name>PICTUREWIND</name>
+</golproperties>

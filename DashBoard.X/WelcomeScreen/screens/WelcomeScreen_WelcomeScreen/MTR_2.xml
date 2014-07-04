@@ -1,0 +1,30 @@
+<golproperties golId="13" golType="MTR">
+<scheme>defscheme</scheme>
+<text>Meter</text>
+<titlefont memory="Internal">Gentium_16</titlefont>
+<valuefont memory="Internal">Gentium_16</valuefont>
+<maxval>50</maxval>
+<minval>1</minval>
+<pos>1</pos>
+<state>
+<list>0</list>
+<list>enabled</list>
+<list>disabled</list>
+</state>
+<visible>
+<list>0</list>
+<list>true</list>
+<list>false</list>
+</visible>
+<metertype>
+<list>0</list>
+<list>whole</list>
+<list>half</list>
+<list>quarter</list>
+</metertype>
+<bottom>165</bottom>
+<right>133</right>
+<top>45</top>
+<left>13</left>
+<name>MTR_2</name>
+</golproperties>

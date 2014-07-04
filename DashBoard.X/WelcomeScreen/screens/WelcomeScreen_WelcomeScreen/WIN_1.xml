@@ -1,0 +1,16 @@
+<golproperties golId="1" golType="WIN">
+<scheme>enter_new_s524cheme</scheme>
+<text>Ablak</text>
+<bitmap memory="Internal">NULL</bitmap>
+<state>
+<list>0</list>
+<list>enabled</list>
+<list>disabled</list>
+</state>
+<visible>
+<list>0</list>
+<list>true</list>
+<list>false</list>
+</visible>
+<name>MAIN_WINDOW</name>
+</golproperties>

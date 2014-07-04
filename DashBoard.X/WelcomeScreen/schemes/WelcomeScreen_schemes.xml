@@ -1,0 +1,11 @@
+<schemes>
+<defscheme>
+<path>schemes/WelcomeScreen_defscheme.xml</path>
+</defscheme>
+<enter_new_scheme>
+<path>schemes/WelcomeScreen_enter_new_scheme.xml</path>
+</enter_new_scheme>
+<enter_new_s524cheme>
+<path>schemes/WelcomeScreen_enter_new_s524cheme.xml</path>
+</enter_new_s524cheme>
+</schemes>

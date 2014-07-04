@@ -1,0 +1,19 @@
+<golproperties golId="10" golType="GRB">
+<scheme>defscheme</scheme>
+<text>GroupBox</text>
+<state>
+<list>0</list>
+<list>enabled</list>
+<list>disabled</list>
+</state>
+<visible>
+<list>0</list>
+<list>true</list>
+<list>false</list>
+</visible>
+<bottom>226</bottom>
+<right>268</right>
+<top>187</top>
+<left>56</left>
+<name>GRB_3</name>
+</golproperties>

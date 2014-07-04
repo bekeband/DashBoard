@@ -1,0 +1,8 @@
+<golproperties cdepth="16" hres="239" paletteenabled="0" version="2.00" vres="319">
+<WelcomeScreen>
+<path>screens/WelcomeScreen_WelcomeScreen/WelcomeScreen.gds</path>
+</WelcomeScreen>
+<PictureScreen>
+<path>screens/WelcomeScreen_PictureScreen/PictureScreen.gds</path>
+</PictureScreen>
+</golproperties>
