@@ -27,10 +27,18 @@
       <itemPath>../src/DashBoard.h</itemPath>
       <itemPath>TestProject/gfx_gdd_screens.h</itemPath>
       <itemPath>TestProject/gdd_resource.h</itemPath>
+      <itemPath>../src/exceptions.h</itemPath>
+      <itemPath>../src/swreset_screen.h</itemPath>
+      <itemPath>../src/main_screen.h</itemPath>
+      <itemPath>../src/options_screen.h</itemPath>
+      <itemPath>../src/defgraphical.h</itemPath>
+      <itemPath>../src/error_screen.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
                    projectFiles="true">
+      <itemPath>../src/app_32MX460F512L.ld</itemPath>
+      <itemPath>../src/options_area.ld</itemPath>
     </logicalFolder>
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
@@ -74,6 +82,9 @@
       <itemPath>../src/DashBoard.c</itemPath>
       <itemPath>../src/options_screen.c</itemPath>
       <itemPath>../src/exceptions.c</itemPath>
+      <itemPath>../src/swreset_screen.c</itemPath>
+      <itemPath>../src/main_screen.c</itemPath>
+      <itemPath>../src/error_screen.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -83,6 +94,7 @@
       <itemPath>TestProject/gdd_resource_reference.c</itemPath>
       <itemPath>TestProject/gdd_resource.S</itemPath>
       <itemPath>TestProject/gdd_resource.h</itemPath>
+      <itemPath>../../../../../../../../../Program Files (x86)/Microchip/xc32/v1.31/pic32mx/lib/proc/32MX460F512L/p32MX460F512L.ld</itemPath>
     </logicalFolder>
   </logicalFolder>
   <sourceRootList>
@@ -98,6 +110,7 @@
     <Elem>../../../../framework/driver/spi/src</Elem>
     <Elem>../../../../framework/driver/gfx</Elem>
     <Elem>../../../../framework/gfx</Elem>
+    <Elem>../../../../../../PIC32Bootloader/linker_scripts/others</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -132,6 +145,20 @@
         <makeCustomizationEnableLongLines>false</makeCustomizationEnableLongLines>
         <makeCustomizationNormalizeHexFile>false</makeCustomizationNormalizeHexFile>
       </makeCustomizationType>
+      <item path="../src/app_32MX460F512L.ld" ex="true" overriding="false">
+        <C32>
+        </C32>
+        <C32-AR>
+        </C32-AR>
+        <C32-AS>
+        </C32-AS>
+        <C32-LD>
+        </C32-LD>
+        <C32CPP>
+        </C32CPP>
+        <C32Global>
+        </C32Global>
+      </item>
       <C32>
         <property key="additional-warnings" value="false"/>
         <property key="enable-app-io" value="false"/>

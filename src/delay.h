@@ -8,12 +8,14 @@
 #ifndef DELAY_H
 #define	DELAY_H
 
+#include <stdint.h>
+
 #ifdef	__cplusplus
 extern "C" {
 #endif
 
-    void __delay_ms(long msec);
-    void __delay_us(long usec);
+    void __delay_ms(uint16_t msec);
+    void __delay_us(uint16_t usec);
 
 #ifdef	__cplusplus
 }

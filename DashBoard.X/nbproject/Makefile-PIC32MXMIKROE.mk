@@ -45,17 +45,17 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
 # Source Files Quoted if spaced
-SOURCEFILES_QUOTED_IF_SPACED=../src/Configs/PIC32MXMIKROE/system.c ../../../../framework/gfx/src/gfx_primitive.c ../../../../framework/gfx/src/gfx_gol.c ../../../../framework/gfx/src/gfx_gol_window.c ../../../../framework/gfx/src/gfx_gol_meter.c ../../../../framework/gfx/src/gfx_gol_button.c ../../../../framework/gfx/src/gfx_gol_static_text.c ../../../../framework/gfx/src/gfx_gol_list_box.c ../../../../framework/gfx/src/gfx_gol_radio_button.c ../../../../framework/gfx/src/gfx_gol_scheme_default.c ../../../../framework/gfx/src/gfx_gol_check_box.c ../../../../framework/gfx/src/gfx_gol_group_box.c ../../../../framework/driver/gfx/src/drv_gfx_tft003.c ../../../../framework/driver/nvm/src/drv_nvm_flash_spi_m25p80.c ../src/gdd_resource.S ../src/gdd_resource_reference.c ../../../../framework/driver/spi/src/drv_spi_16bit.c ../../../../framework/driver/touch_screen/src/drv_touch_resistive_adc.c ../../../../framework/driver/touch_screen/src/drv_touch_screen.c ../src/delay.c ../src/DashBoard.c ../src/options_screen.c ../src/exceptions.c
+SOURCEFILES_QUOTED_IF_SPACED=../src/Configs/PIC32MXMIKROE/system.c ../../../../framework/gfx/src/gfx_primitive.c ../../../../framework/gfx/src/gfx_gol.c ../../../../framework/gfx/src/gfx_gol_window.c ../../../../framework/gfx/src/gfx_gol_meter.c ../../../../framework/gfx/src/gfx_gol_button.c ../../../../framework/gfx/src/gfx_gol_static_text.c ../../../../framework/gfx/src/gfx_gol_list_box.c ../../../../framework/gfx/src/gfx_gol_radio_button.c ../../../../framework/gfx/src/gfx_gol_scheme_default.c ../../../../framework/gfx/src/gfx_gol_check_box.c ../../../../framework/gfx/src/gfx_gol_group_box.c ../../../../framework/driver/gfx/src/drv_gfx_tft003.c ../../../../framework/driver/nvm/src/drv_nvm_flash_spi_m25p80.c ../src/gdd_resource.S ../src/gdd_resource_reference.c ../../../../framework/driver/spi/src/drv_spi_16bit.c ../../../../framework/driver/touch_screen/src/drv_touch_resistive_adc.c ../../../../framework/driver/touch_screen/src/drv_touch_screen.c ../src/delay.c ../src/DashBoard.c ../src/options_screen.c ../src/exceptions.c ../src/swreset_screen.c ../src/main_screen.c ../src/error_screen.c
 
 # Object Files Quoted if spaced
-OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/_ext/1211495701/system.o ${OBJECTDIR}/_ext/386020355/gfx_primitive.o ${OBJECTDIR}/_ext/386020355/gfx_gol.o ${OBJECTDIR}/_ext/386020355/gfx_gol_window.o ${OBJECTDIR}/_ext/386020355/gfx_gol_meter.o ${OBJECTDIR}/_ext/386020355/gfx_gol_button.o ${OBJECTDIR}/_ext/386020355/gfx_gol_static_text.o ${OBJECTDIR}/_ext/386020355/gfx_gol_list_box.o ${OBJECTDIR}/_ext/386020355/gfx_gol_radio_button.o ${OBJECTDIR}/_ext/386020355/gfx_gol_scheme_default.o ${OBJECTDIR}/_ext/386020355/gfx_gol_check_box.o ${OBJECTDIR}/_ext/386020355/gfx_gol_group_box.o ${OBJECTDIR}/_ext/1867384104/drv_gfx_tft003.o ${OBJECTDIR}/_ext/498082052/drv_nvm_flash_spi_m25p80.o ${OBJECTDIR}/_ext/1360937237/gdd_resource.o ${OBJECTDIR}/_ext/1360937237/gdd_resource_reference.o ${OBJECTDIR}/_ext/465164171/drv_spi_16bit.o ${OBJECTDIR}/_ext/200387209/drv_touch_resistive_adc.o ${OBJECTDIR}/_ext/200387209/drv_touch_screen.o ${OBJECTDIR}/_ext/1360937237/delay.o ${OBJECTDIR}/_ext/1360937237/DashBoard.o ${OBJECTDIR}/_ext/1360937237/options_screen.o ${OBJECTDIR}/_ext/1360937237/exceptions.o
-POSSIBLE_DEPFILES=${OBJECTDIR}/_ext/1211495701/system.o.d ${OBJECTDIR}/_ext/386020355/gfx_primitive.o.d ${OBJECTDIR}/_ext/386020355/gfx_gol.o.d ${OBJECTDIR}/_ext/386020355/gfx_gol_window.o.d ${OBJECTDIR}/_ext/386020355/gfx_gol_meter.o.d ${OBJECTDIR}/_ext/386020355/gfx_gol_button.o.d ${OBJECTDIR}/_ext/386020355/gfx_gol_static_text.o.d ${OBJECTDIR}/_ext/386020355/gfx_gol_list_box.o.d ${OBJECTDIR}/_ext/386020355/gfx_gol_radio_button.o.d ${OBJECTDIR}/_ext/386020355/gfx_gol_scheme_default.o.d ${OBJECTDIR}/_ext/386020355/gfx_gol_check_box.o.d ${OBJECTDIR}/_ext/386020355/gfx_gol_group_box.o.d ${OBJECTDIR}/_ext/1867384104/drv_gfx_tft003.o.d ${OBJECTDIR}/_ext/498082052/drv_nvm_flash_spi_m25p80.o.d ${OBJECTDIR}/_ext/1360937237/gdd_resource.o.d ${OBJECTDIR}/_ext/1360937237/gdd_resource_reference.o.d ${OBJECTDIR}/_ext/465164171/drv_spi_16bit.o.d ${OBJECTDIR}/_ext/200387209/drv_touch_resistive_adc.o.d ${OBJECTDIR}/_ext/200387209/drv_touch_screen.o.d ${OBJECTDIR}/_ext/1360937237/delay.o.d ${OBJECTDIR}/_ext/1360937237/DashBoard.o.d ${OBJECTDIR}/_ext/1360937237/options_screen.o.d ${OBJECTDIR}/_ext/1360937237/exceptions.o.d
+OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/_ext/1211495701/system.o ${OBJECTDIR}/_ext/386020355/gfx_primitive.o ${OBJECTDIR}/_ext/386020355/gfx_gol.o ${OBJECTDIR}/_ext/386020355/gfx_gol_window.o ${OBJECTDIR}/_ext/386020355/gfx_gol_meter.o ${OBJECTDIR}/_ext/386020355/gfx_gol_button.o ${OBJECTDIR}/_ext/386020355/gfx_gol_static_text.o ${OBJECTDIR}/_ext/386020355/gfx_gol_list_box.o ${OBJECTDIR}/_ext/386020355/gfx_gol_radio_button.o ${OBJECTDIR}/_ext/386020355/gfx_gol_scheme_default.o ${OBJECTDIR}/_ext/386020355/gfx_gol_check_box.o ${OBJECTDIR}/_ext/386020355/gfx_gol_group_box.o ${OBJECTDIR}/_ext/1867384104/drv_gfx_tft003.o ${OBJECTDIR}/_ext/498082052/drv_nvm_flash_spi_m25p80.o ${OBJECTDIR}/_ext/1360937237/gdd_resource.o ${OBJECTDIR}/_ext/1360937237/gdd_resource_reference.o ${OBJECTDIR}/_ext/465164171/drv_spi_16bit.o ${OBJECTDIR}/_ext/200387209/drv_touch_resistive_adc.o ${OBJECTDIR}/_ext/200387209/drv_touch_screen.o ${OBJECTDIR}/_ext/1360937237/delay.o ${OBJECTDIR}/_ext/1360937237/DashBoard.o ${OBJECTDIR}/_ext/1360937237/options_screen.o ${OBJECTDIR}/_ext/1360937237/exceptions.o ${OBJECTDIR}/_ext/1360937237/swreset_screen.o ${OBJECTDIR}/_ext/1360937237/main_screen.o ${OBJECTDIR}/_ext/1360937237/error_screen.o
+POSSIBLE_DEPFILES=${OBJECTDIR}/_ext/1211495701/system.o.d ${OBJECTDIR}/_ext/386020355/gfx_primitive.o.d ${OBJECTDIR}/_ext/386020355/gfx_gol.o.d ${OBJECTDIR}/_ext/386020355/gfx_gol_window.o.d ${OBJECTDIR}/_ext/386020355/gfx_gol_meter.o.d ${OBJECTDIR}/_ext/386020355/gfx_gol_button.o.d ${OBJECTDIR}/_ext/386020355/gfx_gol_static_text.o.d ${OBJECTDIR}/_ext/386020355/gfx_gol_list_box.o.d ${OBJECTDIR}/_ext/386020355/gfx_gol_radio_button.o.d ${OBJECTDIR}/_ext/386020355/gfx_gol_scheme_default.o.d ${OBJECTDIR}/_ext/386020355/gfx_gol_check_box.o.d ${OBJECTDIR}/_ext/386020355/gfx_gol_group_box.o.d ${OBJECTDIR}/_ext/1867384104/drv_gfx_tft003.o.d ${OBJECTDIR}/_ext/498082052/drv_nvm_flash_spi_m25p80.o.d ${OBJECTDIR}/_ext/1360937237/gdd_resource.o.d ${OBJECTDIR}/_ext/1360937237/gdd_resource_reference.o.d ${OBJECTDIR}/_ext/465164171/drv_spi_16bit.o.d ${OBJECTDIR}/_ext/200387209/drv_touch_resistive_adc.o.d ${OBJECTDIR}/_ext/200387209/drv_touch_screen.o.d ${OBJECTDIR}/_ext/1360937237/delay.o.d ${OBJECTDIR}/_ext/1360937237/DashBoard.o.d ${OBJECTDIR}/_ext/1360937237/options_screen.o.d ${OBJECTDIR}/_ext/1360937237/exceptions.o.d ${OBJECTDIR}/_ext/1360937237/swreset_screen.o.d ${OBJECTDIR}/_ext/1360937237/main_screen.o.d ${OBJECTDIR}/_ext/1360937237/error_screen.o.d
 
 # Object Files
-OBJECTFILES=${OBJECTDIR}/_ext/1211495701/system.o ${OBJECTDIR}/_ext/386020355/gfx_primitive.o ${OBJECTDIR}/_ext/386020355/gfx_gol.o ${OBJECTDIR}/_ext/386020355/gfx_gol_window.o ${OBJECTDIR}/_ext/386020355/gfx_gol_meter.o ${OBJECTDIR}/_ext/386020355/gfx_gol_button.o ${OBJECTDIR}/_ext/386020355/gfx_gol_static_text.o ${OBJECTDIR}/_ext/386020355/gfx_gol_list_box.o ${OBJECTDIR}/_ext/386020355/gfx_gol_radio_button.o ${OBJECTDIR}/_ext/386020355/gfx_gol_scheme_default.o ${OBJECTDIR}/_ext/386020355/gfx_gol_check_box.o ${OBJECTDIR}/_ext/386020355/gfx_gol_group_box.o ${OBJECTDIR}/_ext/1867384104/drv_gfx_tft003.o ${OBJECTDIR}/_ext/498082052/drv_nvm_flash_spi_m25p80.o ${OBJECTDIR}/_ext/1360937237/gdd_resource.o ${OBJECTDIR}/_ext/1360937237/gdd_resource_reference.o ${OBJECTDIR}/_ext/465164171/drv_spi_16bit.o ${OBJECTDIR}/_ext/200387209/drv_touch_resistive_adc.o ${OBJECTDIR}/_ext/200387209/drv_touch_screen.o ${OBJECTDIR}/_ext/1360937237/delay.o ${OBJECTDIR}/_ext/1360937237/DashBoard.o ${OBJECTDIR}/_ext/1360937237/options_screen.o ${OBJECTDIR}/_ext/1360937237/exceptions.o
+OBJECTFILES=${OBJECTDIR}/_ext/1211495701/system.o ${OBJECTDIR}/_ext/386020355/gfx_primitive.o ${OBJECTDIR}/_ext/386020355/gfx_gol.o ${OBJECTDIR}/_ext/386020355/gfx_gol_window.o ${OBJECTDIR}/_ext/386020355/gfx_gol_meter.o ${OBJECTDIR}/_ext/386020355/gfx_gol_button.o ${OBJECTDIR}/_ext/386020355/gfx_gol_static_text.o ${OBJECTDIR}/_ext/386020355/gfx_gol_list_box.o ${OBJECTDIR}/_ext/386020355/gfx_gol_radio_button.o ${OBJECTDIR}/_ext/386020355/gfx_gol_scheme_default.o ${OBJECTDIR}/_ext/386020355/gfx_gol_check_box.o ${OBJECTDIR}/_ext/386020355/gfx_gol_group_box.o ${OBJECTDIR}/_ext/1867384104/drv_gfx_tft003.o ${OBJECTDIR}/_ext/498082052/drv_nvm_flash_spi_m25p80.o ${OBJECTDIR}/_ext/1360937237/gdd_resource.o ${OBJECTDIR}/_ext/1360937237/gdd_resource_reference.o ${OBJECTDIR}/_ext/465164171/drv_spi_16bit.o ${OBJECTDIR}/_ext/200387209/drv_touch_resistive_adc.o ${OBJECTDIR}/_ext/200387209/drv_touch_screen.o ${OBJECTDIR}/_ext/1360937237/delay.o ${OBJECTDIR}/_ext/1360937237/DashBoard.o ${OBJECTDIR}/_ext/1360937237/options_screen.o ${OBJECTDIR}/_ext/1360937237/exceptions.o ${OBJECTDIR}/_ext/1360937237/swreset_screen.o ${OBJECTDIR}/_ext/1360937237/main_screen.o ${OBJECTDIR}/_ext/1360937237/error_screen.o
 
 # Source Files
-SOURCEFILES=../src/Configs/PIC32MXMIKROE/system.c ../../../../framework/gfx/src/gfx_primitive.c ../../../../framework/gfx/src/gfx_gol.c ../../../../framework/gfx/src/gfx_gol_window.c ../../../../framework/gfx/src/gfx_gol_meter.c ../../../../framework/gfx/src/gfx_gol_button.c ../../../../framework/gfx/src/gfx_gol_static_text.c ../../../../framework/gfx/src/gfx_gol_list_box.c ../../../../framework/gfx/src/gfx_gol_radio_button.c ../../../../framework/gfx/src/gfx_gol_scheme_default.c ../../../../framework/gfx/src/gfx_gol_check_box.c ../../../../framework/gfx/src/gfx_gol_group_box.c ../../../../framework/driver/gfx/src/drv_gfx_tft003.c ../../../../framework/driver/nvm/src/drv_nvm_flash_spi_m25p80.c ../src/gdd_resource.S ../src/gdd_resource_reference.c ../../../../framework/driver/spi/src/drv_spi_16bit.c ../../../../framework/driver/touch_screen/src/drv_touch_resistive_adc.c ../../../../framework/driver/touch_screen/src/drv_touch_screen.c ../src/delay.c ../src/DashBoard.c ../src/options_screen.c ../src/exceptions.c
+SOURCEFILES=../src/Configs/PIC32MXMIKROE/system.c ../../../../framework/gfx/src/gfx_primitive.c ../../../../framework/gfx/src/gfx_gol.c ../../../../framework/gfx/src/gfx_gol_window.c ../../../../framework/gfx/src/gfx_gol_meter.c ../../../../framework/gfx/src/gfx_gol_button.c ../../../../framework/gfx/src/gfx_gol_static_text.c ../../../../framework/gfx/src/gfx_gol_list_box.c ../../../../framework/gfx/src/gfx_gol_radio_button.c ../../../../framework/gfx/src/gfx_gol_scheme_default.c ../../../../framework/gfx/src/gfx_gol_check_box.c ../../../../framework/gfx/src/gfx_gol_group_box.c ../../../../framework/driver/gfx/src/drv_gfx_tft003.c ../../../../framework/driver/nvm/src/drv_nvm_flash_spi_m25p80.c ../src/gdd_resource.S ../src/gdd_resource_reference.c ../../../../framework/driver/spi/src/drv_spi_16bit.c ../../../../framework/driver/touch_screen/src/drv_touch_resistive_adc.c ../../../../framework/driver/touch_screen/src/drv_touch_screen.c ../src/delay.c ../src/DashBoard.c ../src/options_screen.c ../src/exceptions.c ../src/swreset_screen.c ../src/main_screen.c ../src/error_screen.c
 
 
 CFLAGS=
@@ -75,7 +75,7 @@ FIXDEPS=fixDeps
 	${MAKE} ${MAKE_OPTIONS} -f nbproject/Makefile-PIC32MXMIKROE.mk dist/${CND_CONF}/${IMAGE_TYPE}/DashBoard.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}
 
 MP_PROCESSOR_OPTION=32MX460F512L
-MP_LINKER_FILE_OPTION=
+MP_LINKER_FILE_OPTION=,--script="..\src\options_area.ld"
 # ------------------------------------------------------------------------------------
 # Rules for buildStep: assemble
 ifeq ($(TYPE_IMAGE), DEBUG_RUN)
@@ -237,6 +237,24 @@ ${OBJECTDIR}/_ext/1360937237/exceptions.o: ../src/exceptions.c  nbproject/Makefi
 	@${RM} ${OBJECTDIR}/_ext/1360937237/exceptions.o 
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1360937237/exceptions.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION) -I"../src/Configs/PIC32MXMIKROE" -I"../src" -I"../../../../framework" -MMD -MF "${OBJECTDIR}/_ext/1360937237/exceptions.o.d" -o ${OBJECTDIR}/_ext/1360937237/exceptions.o ../src/exceptions.c   
 	
+${OBJECTDIR}/_ext/1360937237/swreset_screen.o: ../src/swreset_screen.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} ${OBJECTDIR}/_ext/1360937237 
+	@${RM} ${OBJECTDIR}/_ext/1360937237/swreset_screen.o.d 
+	@${RM} ${OBJECTDIR}/_ext/1360937237/swreset_screen.o 
+	@${FIXDEPS} "${OBJECTDIR}/_ext/1360937237/swreset_screen.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION) -I"../src/Configs/PIC32MXMIKROE" -I"../src" -I"../../../../framework" -MMD -MF "${OBJECTDIR}/_ext/1360937237/swreset_screen.o.d" -o ${OBJECTDIR}/_ext/1360937237/swreset_screen.o ../src/swreset_screen.c   
+	
+${OBJECTDIR}/_ext/1360937237/main_screen.o: ../src/main_screen.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} ${OBJECTDIR}/_ext/1360937237 
+	@${RM} ${OBJECTDIR}/_ext/1360937237/main_screen.o.d 
+	@${RM} ${OBJECTDIR}/_ext/1360937237/main_screen.o 
+	@${FIXDEPS} "${OBJECTDIR}/_ext/1360937237/main_screen.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION) -I"../src/Configs/PIC32MXMIKROE" -I"../src" -I"../../../../framework" -MMD -MF "${OBJECTDIR}/_ext/1360937237/main_screen.o.d" -o ${OBJECTDIR}/_ext/1360937237/main_screen.o ../src/main_screen.c   
+	
+${OBJECTDIR}/_ext/1360937237/error_screen.o: ../src/error_screen.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} ${OBJECTDIR}/_ext/1360937237 
+	@${RM} ${OBJECTDIR}/_ext/1360937237/error_screen.o.d 
+	@${RM} ${OBJECTDIR}/_ext/1360937237/error_screen.o 
+	@${FIXDEPS} "${OBJECTDIR}/_ext/1360937237/error_screen.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION) -I"../src/Configs/PIC32MXMIKROE" -I"../src" -I"../../../../framework" -MMD -MF "${OBJECTDIR}/_ext/1360937237/error_screen.o.d" -o ${OBJECTDIR}/_ext/1360937237/error_screen.o ../src/error_screen.c   
+	
 else
 ${OBJECTDIR}/_ext/1211495701/system.o: ../src/Configs/PIC32MXMIKROE/system.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} ${OBJECTDIR}/_ext/1211495701 
@@ -370,6 +388,24 @@ ${OBJECTDIR}/_ext/1360937237/exceptions.o: ../src/exceptions.c  nbproject/Makefi
 	@${RM} ${OBJECTDIR}/_ext/1360937237/exceptions.o 
 	@${FIXDEPS} "${OBJECTDIR}/_ext/1360937237/exceptions.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION) -I"../src/Configs/PIC32MXMIKROE" -I"../src" -I"../../../../framework" -MMD -MF "${OBJECTDIR}/_ext/1360937237/exceptions.o.d" -o ${OBJECTDIR}/_ext/1360937237/exceptions.o ../src/exceptions.c   
 	
+${OBJECTDIR}/_ext/1360937237/swreset_screen.o: ../src/swreset_screen.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} ${OBJECTDIR}/_ext/1360937237 
+	@${RM} ${OBJECTDIR}/_ext/1360937237/swreset_screen.o.d 
+	@${RM} ${OBJECTDIR}/_ext/1360937237/swreset_screen.o 
+	@${FIXDEPS} "${OBJECTDIR}/_ext/1360937237/swreset_screen.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION) -I"../src/Configs/PIC32MXMIKROE" -I"../src" -I"../../../../framework" -MMD -MF "${OBJECTDIR}/_ext/1360937237/swreset_screen.o.d" -o ${OBJECTDIR}/_ext/1360937237/swreset_screen.o ../src/swreset_screen.c   
+	
+${OBJECTDIR}/_ext/1360937237/main_screen.o: ../src/main_screen.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} ${OBJECTDIR}/_ext/1360937237 
+	@${RM} ${OBJECTDIR}/_ext/1360937237/main_screen.o.d 
+	@${RM} ${OBJECTDIR}/_ext/1360937237/main_screen.o 
+	@${FIXDEPS} "${OBJECTDIR}/_ext/1360937237/main_screen.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION) -I"../src/Configs/PIC32MXMIKROE" -I"../src" -I"../../../../framework" -MMD -MF "${OBJECTDIR}/_ext/1360937237/main_screen.o.d" -o ${OBJECTDIR}/_ext/1360937237/main_screen.o ../src/main_screen.c   
+	
+${OBJECTDIR}/_ext/1360937237/error_screen.o: ../src/error_screen.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} ${OBJECTDIR}/_ext/1360937237 
+	@${RM} ${OBJECTDIR}/_ext/1360937237/error_screen.o.d 
+	@${RM} ${OBJECTDIR}/_ext/1360937237/error_screen.o 
+	@${FIXDEPS} "${OBJECTDIR}/_ext/1360937237/error_screen.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION) -I"../src/Configs/PIC32MXMIKROE" -I"../src" -I"../../../../framework" -MMD -MF "${OBJECTDIR}/_ext/1360937237/error_screen.o.d" -o ${OBJECTDIR}/_ext/1360937237/error_screen.o ../src/error_screen.c   
+	
 endif
 
 # ------------------------------------------------------------------------------------
@@ -381,12 +417,12 @@ endif
 # ------------------------------------------------------------------------------------
 # Rules for buildStep: link
 ifeq ($(TYPE_IMAGE), DEBUG_RUN)
-dist/${CND_CONF}/${IMAGE_TYPE}/DashBoard.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}: ${OBJECTFILES}  nbproject/Makefile-${CND_CONF}.mk    
+dist/${CND_CONF}/${IMAGE_TYPE}/DashBoard.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}: ${OBJECTFILES}  nbproject/Makefile-${CND_CONF}.mk    ../src/options_area.ld
 	@${MKDIR} dist/${CND_CONF}/${IMAGE_TYPE} 
 	${MP_CC} $(MP_EXTRA_LD_PRE)  -mdebugger -D__MPLAB_DEBUGGER_PK3=1 -mprocessor=$(MP_PROCESSOR_OPTION)  -o dist/${CND_CONF}/${IMAGE_TYPE}/DashBoard.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX} ${OBJECTFILES_QUOTED_IF_SPACED}           -mreserve=data@0x0:0x1FC -mreserve=boot@0x1FC02000:0x1FC02FEF -mreserve=boot@0x1FC02000:0x1FC024FF  -Wl,--defsym=__MPLAB_BUILD=1$(MP_EXTRA_LD_POST)$(MP_LINKER_FILE_OPTION),--defsym=__MPLAB_DEBUG=1,--defsym=__DEBUG=1,--defsym=__MPLAB_DEBUGGER_PK3=1,--defsym=_min_heap_size=20000,--defsym=_min_stack_size=512,-Map="${DISTDIR}/${PROJECTNAME}.${IMAGE_TYPE}.map",--report-mem,--cref
 	
 else
-dist/${CND_CONF}/${IMAGE_TYPE}/DashBoard.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}: ${OBJECTFILES}  nbproject/Makefile-${CND_CONF}.mk   
+dist/${CND_CONF}/${IMAGE_TYPE}/DashBoard.X.${IMAGE_TYPE}.${OUTPUT_SUFFIX}: ${OBJECTFILES}  nbproject/Makefile-${CND_CONF}.mk   ../src/options_area.ld
 	@${MKDIR} dist/${CND_CONF}/${IMAGE_TYPE} 
 	${MP_CC} $(MP_EXTRA_LD_PRE)  -mprocessor=$(MP_PROCESSOR_OPTION)  -o dist/${CND_CONF}/${IMAGE_TYPE}/DashBoard.X.${IMAGE_TYPE}.${DEBUGGABLE_SUFFIX} ${OBJECTFILES_QUOTED_IF_SPACED}          -Wl,--defsym=__MPLAB_BUILD=1$(MP_EXTRA_LD_POST)$(MP_LINKER_FILE_OPTION),--defsym=_min_heap_size=20000,--defsym=_min_stack_size=512,-Map="${DISTDIR}/${PROJECTNAME}.${IMAGE_TYPE}.map",--report-mem,--cref
 	${MP_CC_DIR}\\xc32-bin2hex dist/${CND_CONF}/${IMAGE_TYPE}/DashBoard.X.${IMAGE_TYPE}.${DEBUGGABLE_SUFFIX} 

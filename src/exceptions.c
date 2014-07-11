@@ -11,6 +11,7 @@
 #include <stdbool.h>         /* For true/false definition                     */
 #include <stdlib.h>
 #include "gfx/gfx.h"
+#include "exceptions.h"
 
 /******************************************************************************/
 /* Exception Macro Definitions                                                */
@@ -25,8 +26,6 @@ write routine to save the exception cause register.*/
 
 /* Physical Addresses which are at the end of KSEG 0 program memory. */
 /* User may want to adjust these values */
-#define EXCEPTION_CAUSE 0x1D007FFC
-#define EXCEPTION_ADDR  0x1D007FF8
 
 #endif
 
@@ -52,13 +51,20 @@ static enum {
     EXCEP_C2E                /* coprocessor 2 */
 } _excep_code;
 
-/* static in case exception condition would stop auto variable being created */
-static unsigned int _epc_code;
-static unsigned int _excep_addr;
+static GFX_XCHAR message_buffer[80];
 
-static GFX_XCHAR message[20] = "EXADDR:           ";
-static GFX_XCHAR mcode[20] = "CODE:           ";
+void OutExceptionDatas()
+{
+  GFX_ColorSet(BLACK);
+  GFX_ScreenClear();
+  GFX_ColorSet(WHITE);
+  GFX_TextStringDraw(80, 210, (GFX_XCHAR*)&message_buffer, strlen(message_buffer));
+};
 
+void FormatExceptionString(GFX_XCHAR* buffer)
+{
+  sprintf(buffer, "Exception code %u, address %lx", _excep_code, _excep_addr);
+}
 
 /******************************************************************************/
 /* Exception Handling                                                         */
@@ -68,7 +74,7 @@ static GFX_XCHAR mcode[20] = "CODE:           ";
 is defined in the C32 User's Guide.  The _weak_ _generic_exception_handler
 just does an infinite loop. */
 void _general_exception_handler(void)
-{
+{ int i;
     unsigned long t0 = _CP0_GET_COUNT(); /* Used for NVMOP 6 us Delay */
 
     /* Mask off Mask of the ExcCode Field from the Cause Register
@@ -120,17 +126,21 @@ void _general_exception_handler(void)
 
     /* Write the exception cause and address to the part can be read and
     the cause determined. */
-    NVMWriteWord((void*)EXCEPTION_CAUSE, _excep_code);
-    NVMWriteWord((void*)EXCEPTION_ADDR, _excep_addr);
+    FormatExceptionString(message_buffer);
+
+    if (!NVMWriteWord((void*)EXCEPTION_CAUSE, _excep_code) && !NVMWriteWord((void*)EXCEPTION_ADDR, _excep_addr))
+    {
+      GFX_ColorSet(BLACK);
+    } else
+    {
+      GFX_ColorSet(RED);
+    }
+
+    OutExceptionDatas();
+    for (i = 0; i < 5; i++) __delay_ms(400);
+    SoftReset();
 
 #endif
-  GFX_ColorSet(BLACK);
 
-  utoa(&message[8], _excep_addr, 16);
-  utoa(&mcode[6], _epc_code, 16);
-
-  GFX_TextStringDraw(80, 210, (GFX_XCHAR*)&message, strlen(message));
-  GFX_TextStringDraw(80, 225, (GFX_XCHAR*)&mcode, strlen(mcode));
-  while (1);
 }
 

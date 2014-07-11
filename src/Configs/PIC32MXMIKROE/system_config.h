@@ -590,4 +590,8 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #define USBInitialize
 #define USBTasks
 
+/* Write exception to flash program ram. */
+
+#define WRITE_EXCEPTION_CAUSE_TO_FLASH
+
 #endif

@@ -69,8 +69,6 @@ uint16_t CreateOptions(void)
     return -1;
   }
 
-  
-
   return 0;
 }
 
@@ -79,10 +77,18 @@ bool     OptionsDrawCallback(void)
 
 }
 
-bool     MsgOptionsCallback(uint16_t objMsg, GFX_GOL_OBJ_HEADER *pObj, GFX_GOL_MESSAGE *pMsg)
+bool MsgOptionsCallback(GFX_GOL_TRANSLATED_ACTION objMsg, GFX_GOL_OBJ_HEADER *pObject, GFX_GOL_MESSAGE *pMessage)
 {
   uint16_t           objectID;
 
-  objectID = GFX_GOL_ObjectIDGet(pObj);
+  objectID = GFX_GOL_ObjectIDGet(pObject);
+
+  if (objectID == ID_RADIOBUTTON2)
+  {
+    if (objMsg == GFX_GOL_RADIOBUTTON_ACTION_CHECKED )
+    {
+      if ((67 / 0) > 1) return 0;
+    }
+  }
 
 }
