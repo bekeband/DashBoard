@@ -89,6 +89,10 @@ bool MsgOptionsCallback(GFX_GOL_TRANSLATED_ACTION objMsg, GFX_GOL_OBJ_HEADER *pO
     {
       if ((67 / 0) > 1) return 0;
     }
+  } else
+  if (objectID == ID_RADIOBUTTON1)
+  {
+    SoftReset();
   }
 
 }

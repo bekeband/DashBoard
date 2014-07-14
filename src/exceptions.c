@@ -33,23 +33,8 @@ write routine to save the exception cause register.*/
 /* Exception Variable Declaration                                             */
 /******************************************************************************/
 
-/* static in case exception condition would stop auto variable being created  */
-static enum {
-    EXCEP_IRQ = 0,           /* interrupt */
-    EXCEP_AdEL = 4,          /* address error exception (load or ifetch) */
-    EXCEP_AdES,              /* address error exception (store) */
-    EXCEP_IBE,               /* bus error (ifetch) */
-    EXCEP_DBE,               /* bus error (load/store) */
-    EXCEP_Sys,               /* syscall */
-    EXCEP_Bp,                /* breakpoint */
-    EXCEP_RI,                /* reserved instruction */
-    EXCEP_CpU,               /* coprocessor unusable */
-    EXCEP_Overflow,          /* arithmetic overflow */
-    EXCEP_Trap,              /* trap (possible divide by zero) */
-    EXCEP_IS1 = 16,          /* implementation specfic 1 */
-    EXCEP_CEU,               /* CorExtend Unuseable */
-    EXCEP_C2E                /* coprocessor 2 */
-} _excep_code;
+static uint32_t _excep_addr;
+static enum E_EXCEPT_TYPE _excep_code;
 
 static GFX_XCHAR message_buffer[80];
 
@@ -61,9 +46,14 @@ void OutExceptionDatas()
   GFX_TextStringDraw(80, 210, (GFX_XCHAR*)&message_buffer, strlen(message_buffer));
 };
 
+GFX_XCHAR* GetExceptionString()
+{
+  return (GFX_XCHAR*)&message_buffer;
+}
+
 void FormatExceptionString(GFX_XCHAR* buffer)
 {
-  sprintf(buffer, "Exception code %u, address %lx", _excep_code, _excep_addr);
+  sprintf(message_buffer, "Exception code %u, address %lx", (unsigned int)_excep_code, _excep_addr);
 }
 
 /******************************************************************************/
@@ -81,6 +71,7 @@ void _general_exception_handler(void)
     Refer to the MIPs M4K Software User's manual */
     _excep_code=_CP0_GET_CAUSE() & 0x0000007C >> 2;
     _excep_addr=_CP0_GET_EPC();
+    _excep_addr = 0x12345678;
 
     _CP0_SET_STATUS(_CP0_GET_STATUS()&0xFFFFFFE); /* Disable Interrupts */
 

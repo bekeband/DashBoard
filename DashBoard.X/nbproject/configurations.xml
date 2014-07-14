@@ -81,10 +81,10 @@
       <itemPath>../src/delay.c</itemPath>
       <itemPath>../src/DashBoard.c</itemPath>
       <itemPath>../src/options_screen.c</itemPath>
-      <itemPath>../src/exceptions.c</itemPath>
       <itemPath>../src/swreset_screen.c</itemPath>
       <itemPath>../src/main_screen.c</itemPath>
       <itemPath>../src/error_screen.c</itemPath>
+      <itemPath>../src/exceptions.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -198,9 +198,9 @@
         <property key="keep-locals" value="false"/>
         <property key="list-assembly" value="false"/>
         <property key="list-source" value="false"/>
-        <property key="list-symbols" value="false"/>
-        <property key="oXC32asm-list-to-file" value="false"/>
-        <property key="omit-debug-dirs" value="false"/>
+        <property key="list-symbols" value="true"/>
+        <property key="oXC32asm-list-to-file" value="true"/>
+        <property key="omit-debug-dirs" value="true"/>
         <property key="omit-forms" value="false"/>
         <property key="preprocessor-macros" value=""/>
         <property key="warning-level" value=""/>
@@ -265,7 +265,7 @@
       <C32Global>
         <property key="gp-relative-option" value=""/>
         <property key="legacy-libc" value="false"/>
-        <property key="save-temps" value="false"/>
+        <property key="save-temps" value="true"/>
         <property key="wpo-lto" value="false"/>
       </C32Global>
       <PICkit3PlatformTool>
