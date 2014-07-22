@@ -4,10 +4,10 @@
 #define _EXCEPTIONS_H_
 
 /* Define the exception address, and cause store address in program memory. */
-#define EXCEPTION_CAUSE 0x1D030000
-#define EXCEPTION_CAUSE_VIRTUAL 0x9D030000
-#define EXCEPTION_ADDR  0x1D030004
-#define EXCEPTION_ADDR_VIRTUAL  0x9D030004
+#define EXCEPTION_CAUSE 0x1D07F000
+#define EXCEPTION_CAUSE_VIRTUAL 0x9D07F000
+#define EXCEPTION_ADDR  0x1D07F004
+#define EXCEPTION_ADDR_VIRTUAL  0x9D07F004
 
 /* static in case exception condition would stop auto variable being created  */
 static enum E_EXCEPT_TYPE {

@@ -53,7 +53,7 @@ GFX_XCHAR* GetExceptionString()
 
 void FormatExceptionString(GFX_XCHAR* buffer)
 {
-  sprintf(message_buffer, "Exception code %u, address %lx", (unsigned int)_excep_code, _excep_addr);
+  sprintf(message_buffer, "Exception code %2X, address %4x", (unsigned int)_excep_code, _excep_addr);
 }
 
 /******************************************************************************/
@@ -71,7 +71,6 @@ void _general_exception_handler(void)
     Refer to the MIPs M4K Software User's manual */
     _excep_code=_CP0_GET_CAUSE() & 0x0000007C >> 2;
     _excep_addr=_CP0_GET_EPC();
-    _excep_addr = 0x12345678;
 
     _CP0_SET_STATUS(_CP0_GET_STATUS()&0xFFFFFFE); /* Disable Interrupts */
 
@@ -119,13 +118,7 @@ void _general_exception_handler(void)
     the cause determined. */
     FormatExceptionString(message_buffer);
 
-    if (!NVMWriteWord((void*)EXCEPTION_CAUSE, _excep_code) && !NVMWriteWord((void*)EXCEPTION_ADDR, _excep_addr))
-    {
-      GFX_ColorSet(BLACK);
-    } else
-    {
-      GFX_ColorSet(RED);
-    }
+    GFX_ColorSet(BLACK);
 
     OutExceptionDatas();
     for (i = 0; i < 5; i++) __delay_ms(400);

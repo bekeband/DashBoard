@@ -3,8 +3,11 @@
 #include "swreset_screen.h"
 #include "exceptions.h"
 
-//const uint32_t EXCEPTION_CAUSE_DATA __attribute__((space(prog), address(EXCEPTION_CAUSE_VIRTUAL), section(".text.EXCEPT_CAUSE_DATA"))) = 0x54;
-const uint32_t EXCEPTION_ADDR_DATA __attribute__((space(prog), address(EXCEPTION_ADDR_VIRTUAL), section(".text.EXCEPT_ADDR_DATA"))) = 0x87654321;
+/*const unsigned char DATA[8] __attribute__((space(prog), address(EXCEPTION_CAUSE_VIRTUAL), section(".text.EXCEPT_CAUSE_DATA")))
+  = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};*/
+
+const uint32_t EXCEPTION_CAUSE_DATA __attribute__((space(prog), address(EXCEPTION_CAUSE_VIRTUAL), section(".text.EXCEPT_CAUSE_DATA"))) = 0xFFFFFFFF;
+const uint32_t EXCEPTION_ADDR_DATA __attribute__((space(prog), address(EXCEPTION_ADDR_VIRTUAL), section(".text.EXCEPT_ADDR_DATA"))) = 0xFFFFFFFF;
 
 GFX_GOL_OBJ_SCHEME  swresetscheme;          // Options Scheme
 
@@ -29,10 +32,11 @@ bool MsgSwresetCallback(GFX_GOL_TRANSLATED_ACTION objMsg, GFX_GOL_OBJ_HEADER *pO
   return true;
 }
 
-static GFX_XCHAR b[80];
+
 
 uint16_t CreateSwreset()
 {
+  static unsigned char b[80];
 /*  _excep_code = EXCEPTION_CAUSE_DATA;
   _excep_addr = EXCEPTION_ADDR_DATA;*/
 
@@ -40,7 +44,7 @@ uint16_t CreateSwreset()
 
   // EXCEPTION_CAUSE_DATA, EXCEPTION_ADDR_DATA
 
-  sprintf(b, "Exception occurs code = %u, address = %lX", 0x55AA, *(uint32_t*)&EXCEPTION_ADDR_DATA);
+  sprintf(b, "Exception code = 0X%2X, Address = 0X%4X", EXCEPTION_CAUSE_DATA, EXCEPTION_ADDR_DATA);
 
   if (GFX_GOL_StaticTextCreate (SWRESET_TEXT, 0, 0, 319, 200,
     GFX_GOL_STATICTEXT_DRAW_STATE, b,

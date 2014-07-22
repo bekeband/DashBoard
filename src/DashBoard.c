@@ -81,7 +81,6 @@ bool APP_ObjectDrawCallback(void)
   switch (screenState)
   {
     case INIT_PROGRAM:
-//      SetMainScheme();
       if (mGetSWRFlag())
       {
         mClearSWRFlag();
