@@ -39,9 +39,8 @@ typedef enum
 
 typedef enum
 {
-  ISO9141_5BAUD,
-  KWP_5BAUD,
-  KWP_FAST,
+  INIT,
+  START
 } CONNECT_STATES;
 
 APP_SCREEN_STATES   screenState;
@@ -97,7 +96,6 @@ bool APP_ObjectDrawCallback(void)
       break;
     case CREATE_MAIN_MENU:
       GFX_GOL_ObjectListFree();
-//      SetMainScheme();
       CreateOptionsButton();
       MainScreenCreate();
       screenState = DISPLAY_MAIN_MENU;       // switch to next state
@@ -105,7 +103,6 @@ bool APP_ObjectDrawCallback(void)
     case DISPLAY_MAIN_MENU:
       break;
     case CREATE_OPTIONS:
-//      SetOptionsScheme();
       GFX_ColorSet(BLUE);
       GFX_ScreenClear();
       APP_CreateMainButton();
@@ -162,11 +159,8 @@ bool APP_ObjectMessageCallback( GFX_GOL_TRANSLATED_ACTION objectMessage,
     case DISPLAY_OPTIONS:
       if ((objectMessage == GFX_GOL_BUTTON_ACTION_RELEASED) && (objID == ID_MAIN))
       {
-
         if (GFX_GOL_ObjectStateGet(pObject, GFX_GOL_BUTTON_PRESSED_STATE))
         {
-            /* Test for exception. */
-
           GFX_GOL_ObjectListFree();
           screenState = CREATE_BACKGROUND;
         };
@@ -227,11 +221,15 @@ int main(int argc, char** argv) {
         if(GFX_GOL_ObjectListDraw() == GFX_STATUS_SUCCESS)
         {
           TouchGetMsg(&msg);                // Get message from touch screen
+/*          msg.uiEvent = EVENT_RELEASE;
+          msg.param1 = 190;
+          msg.param2 = 10;*/
+
           /* If is not touch message, then get tick message. */
-          if (msg.uiEvent == EVENT_INVALID)
+/*          if (msg.uiEvent == EVENT_INVALID)
           {
             TickGetMessage(&msg);
-          }
+          }*/
           GFX_GOL_ObjectMessage(&msg);      // Process message
         }
     }

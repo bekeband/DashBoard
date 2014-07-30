@@ -1,9 +1,13 @@
 
-
+#include "xc.h"
+#include "system_config.h"
 #include "options_screen.h"
 #include "DashBoard.h"
 
 GFX_GOL_OBJ_SCHEME  optscheme;          // Options Scheme
+enum E_CONNECT_TYPE CONNECT_TYPE;
+/* Automatic trying connection (infinity). */
+unsigned int TRYING_CONN;
 
 void SetOptionsScheme()
 {
@@ -32,6 +36,7 @@ uint16_t CreateOptions(void)
 {
   int width = GFX_MaxXGet();
   int height = GFX_TextStringHeightGet(optscheme.pFont);
+  uint16_t newstate;
 
   if (GFX_GOL_GroupboxCreate(ID_CONTYPE_BOX, 0, 0, width, (height * 2) + 10,
     GFX_GOL_GROUPBOX_DRAW_STATE, "Connection type", GFX_ALIGN_VCENTER,
@@ -40,34 +45,51 @@ uint16_t CreateOptions(void)
     return -1;    
   }
 
+  newstate = GFX_GOL_RADIOBUTTON_DRAW_STATE | GFX_GOL_RADIOBUTTON_GROUP_STATE;
+  if (CONNECT_TYPE == ISO_9141_SLOW) newstate |= GFX_GOL_RADIOBUTTON_CHECKED_STATE;
+
   width -= 3;
   if (GFX_GOL_RadioButtonCreate(ID_RADIOBUTTON1, 3, height + 2, (width / 3), (height * 2) + 6,
-      GFX_GOL_RADIOBUTTON_DRAW_STATE | GFX_GOL_RADIOBUTTON_GROUP_STATE,
-      "ISO 9141 SLOW", GFX_ALIGN_CENTER, &optscheme) == NULL)
+      newstate, "ISO 9141 SLOW", GFX_ALIGN_CENTER, &optscheme) == NULL)
   {
     return -1;
   };
+
+  newstate = GFX_GOL_RADIOBUTTON_DRAW_STATE;
+  if (CONNECT_TYPE == KWP_SLOW) newstate |= GFX_GOL_RADIOBUTTON_CHECKED_STATE;
 
   if (GFX_GOL_RadioButtonCreate(ID_RADIOBUTTON2, (width / 3), height + 2, (width / 3) * 2, (height * 2) + 6,
-      GFX_GOL_RADIOBUTTON_DRAW_STATE,
-      "KWP SLOW", GFX_ALIGN_CENTER, &optscheme) == NULL)
+      newstate, "KWP SLOW", GFX_ALIGN_CENTER, &optscheme) == NULL)
   {
     return -1;
   };
 
-    if (GFX_GOL_RadioButtonCreate(ID_RADIOBUTTON3, (width / 3) * 2, height + 2, width, (height * 2) + 6,
-      GFX_GOL_RADIOBUTTON_DRAW_STATE,
-      "KWP FAST", GFX_ALIGN_CENTER, &optscheme) == NULL)
+  newstate = GFX_GOL_RADIOBUTTON_DRAW_STATE;
+  if (CONNECT_TYPE == KWP_FAST) newstate |= GFX_GOL_RADIOBUTTON_CHECKED_STATE;
+
+  if (GFX_GOL_RadioButtonCreate(ID_RADIOBUTTON3, (width / 3) * 2, height + 2, width, (height * 2) + 6,
+      newstate, "KWP FAST", GFX_ALIGN_CENTER, &optscheme) == NULL)
   {
     return -1;
   };
 
-  if (GFX_GOL_GroupboxCreate(ID_BOX_TRYING, 0, (height * 2) + 12, width, (height * 2) + 80,
-    GFX_GOL_GROUPBOX_DRAW_STATE, "Trying connection", GFX_ALIGN_VCENTER,
-      &optscheme) == NULL)
+  newstate = GFX_GOL_CHECKBOX_DRAW_STATE;
+  if (TRYING_CONN) newstate |= GFX_GOL_CHECKBOX_CHECKED_STATE;
+
+  if (GFX_GOL_CheckBoxCreate(ID_AUTO_CHECKBOX, 3, (height * 3) + 12, (width / 2), (height * 4) + 20,
+      newstate, "AUTO CONNECT", GFX_ALIGN_CENTER, &optscheme) == NULL)
   {
     return -1;
-  }
+  };
+
+/*  newstate = GFX_GOL_CHECKBOX_DRAW_STATE;
+  if (TRYING_CONN) newstate |= GFX_GOL_RADIOBUTTON_CHECKED_STATE;
+
+  if (GFX_GOL_CheckBoxCreate(ID_MANUAL_RADIO, (width / 2), (height * 3) + 12, (width / 2) * 2, (height * 4) + 20,
+      newstate, "MANU", GFX_ALIGN_CENTER, &optscheme) == NULL)
+  {
+    return -1;
+  };*/
 
   return 0;
 }
@@ -80,19 +102,34 @@ bool     OptionsDrawCallback(void)
 bool MsgOptionsCallback(GFX_GOL_TRANSLATED_ACTION objMsg, GFX_GOL_OBJ_HEADER *pObject, GFX_GOL_MESSAGE *pMessage)
 {
   uint16_t           objectID;
+  GFX_GOL_CHECKBOX* PC;
 
   objectID = GFX_GOL_ObjectIDGet(pObject);
 
-  if (objectID == ID_RADIOBUTTON2)
-  {
-    if (objMsg == GFX_GOL_RADIOBUTTON_ACTION_CHECKED )
-    {
-      if ((67 / 0) > 1) return 0;
-    }
-  } else
+  /* KWP FAST */
+
   if (objectID == ID_RADIOBUTTON1)
   {
-    SoftReset();
-  }
+    CONNECT_TYPE = ISO_9141_SLOW;
+  } else /*KWP SLOW */
+  if (objectID == ID_RADIOBUTTON2)
+  {
+    CONNECT_TYPE = KWP_SLOW;
+  } else /* ISO 9141 SLOW */
+  if (objectID == ID_RADIOBUTTON3)
+  {
+    CONNECT_TYPE = KWP_FAST;
+  } else
+    if (objectID == ID_AUTO_CHECKBOX)
+    { 
+      if (objMsg == GFX_GOL_CHECKBOX_ACTION_CHECKED)
+      {
+        TRYING_CONN = 1;
+      }
+      else if (objMsg == GFX_GOL_CHECKBOX_ACTION_UNCHECKED)
+      {
+        TRYING_CONN = 0;
+      }
+    };
 
 }

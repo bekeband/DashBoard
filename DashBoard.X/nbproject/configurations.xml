@@ -33,6 +33,7 @@
       <itemPath>../src/options_screen.h</itemPath>
       <itemPath>../src/defgraphical.h</itemPath>
       <itemPath>../src/error_screen.h</itemPath>
+      <itemPath>../src/datacheckbox.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -85,6 +86,7 @@
       <itemPath>../src/main_screen.c</itemPath>
       <itemPath>../src/error_screen.c</itemPath>
       <itemPath>../src/exceptions.c</itemPath>
+      <itemPath>../src/datacheckbox.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -544,6 +546,20 @@
         <makeCustomizationEnableLongLines>false</makeCustomizationEnableLongLines>
         <makeCustomizationNormalizeHexFile>false</makeCustomizationNormalizeHexFile>
       </makeCustomizationType>
+      <item path="../src/app_32MX460F512L.ld" ex="true" overriding="false">
+        <C32>
+        </C32>
+        <C32-AR>
+        </C32-AR>
+        <C32-AS>
+        </C32-AS>
+        <C32-LD>
+        </C32-LD>
+        <C32CPP>
+        </C32CPP>
+        <C32Global>
+        </C32Global>
+      </item>
       <C32>
         <property key="additional-warnings" value="false"/>
         <property key="enable-app-io" value="false"/>
@@ -667,7 +683,7 @@
         <property key="codecoverage.outputfile" value=""/>
         <property key="oscillator.auxfrequency" value="120"/>
         <property key="oscillator.auxfrequencyunit" value="Mega"/>
-        <property key="oscillator.frequency" value="1"/>
+        <property key="oscillator.frequency" value="80"/>
         <property key="oscillator.frequencyunit" value="Mega"/>
         <property key="oscillator.rcfrequency" value="250"/>
         <property key="oscillator.rcfrequencyunit" value="Kilo"/>

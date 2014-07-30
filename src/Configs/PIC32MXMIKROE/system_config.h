@@ -590,8 +590,20 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #define USBInitialize
 #define USBTasks
 
+/* Can exception data in flash memory ??*/
+//#define EXCEPTIONS_CODE
+
 /* Write exception to flash program ram. */
 
 #define WRITE_EXCEPTION_CAUSE_TO_FLASH
+
+/* FLASH_PAGE_ERASE Erase the last flash page of program memory ?*/
+
+//#define FLASH_PAGE_ERASE
+/* Keyboard disable. */
+#define GFX_CONFIG_USE_KEYBOARD_DISABLE
+/* I don't no */
+//#define GFX_LIB_CFG_USE_FOCUS
+//#define GFX_CONFIG_USE_TOUCHSCREEN_DISABLE
 
 #endif

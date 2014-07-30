@@ -9,6 +9,10 @@
 #define EXCEPTION_ADDR  0x1D07F004
 #define EXCEPTION_ADDR_VIRTUAL  0x9D07F004
 
+#define EXCEPTION_STRS  0x1D07F008
+#define EXCEPTION_STRS_VIRTUAL  0x9D07F008
+
+
 /* static in case exception condition would stop auto variable being created  */
 static enum E_EXCEPT_TYPE {
     EXCEP_IRQ = 0,           /* interrupt */

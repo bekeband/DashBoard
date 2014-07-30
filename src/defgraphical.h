@@ -23,6 +23,8 @@ extern const GFX_GOL_OBJ_SCHEME GOLSchemeDefault;
 #define ID_CONTYPE_BOX    100
 #define ID_CHECKBOX1      101
 
+#define ID_AUTO_CHECKBOX  200
+
 #define ID_RADIOBUTTON1   102
 #define ID_RADIOBUTTON2   103
 #define ID_RADIOBUTTON3   104

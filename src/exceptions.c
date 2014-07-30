@@ -76,9 +76,28 @@ void _general_exception_handler(void)
 
 #ifdef WRITE_EXCEPTION_CAUSE_TO_FLASH
 
-    /* Store the exception causes in program memory in case the part exhibited
-    the problem in release mode.  Gives user a place to start debugging
-    the problem. */
+    /* Store the exception causes in program memory in case the part exhibited 
+     * the problem in release mode.  Gives user a place to start debugging the problem. */
+
+#ifdef FLASH_PAGE_ERASE
+
+    /* First we clear the last flash memory page. */
+    NVMCON = 0x4004;            /* 0100 = Page erase operation: erases page selected by NVMADDR, if it is not write-protected */
+    NVMADDR = EXCEPTION_CAUSE;  /* Address for page erase.  */
+
+    /* wait at least 6 us for LVD start-up
+    assume we're running at max frequency
+    (80 MHz) so we're always safe */
+    {
+        while (_CP0_GET_COUNT() - t0 < (80/2)*6);
+    }
+
+    NVMKEY    = 0xAA996655;
+    NVMKEY    = 0x556699AA;     /* unlock sequence */
+    NVMCONSET = NVMCON_WR;
+    while(NVMCON & NVMCON_WR);  /* wait on write to finish */
+
+#endif
 
     NVMCON = 0x4001;            /* set WREN and Word Programing mode */
     NVMADDR = EXCEPTION_CAUSE;  /* PM Address at which we'll store the */

@@ -49,7 +49,7 @@ void MainScreenCreate(void)
 
     pMAIN_TERMINAL = GFX_GOL_StaticTextCreate (
         MAIN_TERMINAL,                  // ID
-        0, 100, 319, 200,               // dimension
+        0, 100, 319, 160,               // dimension
         GFX_GOL_STATICTEXT_DRAW_STATE,  // draw the object
         (GFX_XCHAR*)TerminalBuffer,     // 2 lines of text
         GFX_ALIGN_LEFT | GFX_ALIGN_TOP, // align text on the center
@@ -62,6 +62,9 @@ void MainScreenCreate(void)
       {
         pMAIN_TERMINAL->hdr.actionGet = TerminalActionGet;
       }
+
+/*    GFX_GOL_CheckBoxCreate(ID_CONTYPE_BOX, 0, 180, 319, 220, GFX_GOL_CHECKBOX_DRAW_STATE,
+        "Scale", GFX_ALIGN_CENTER, &MAIN_SCHEME);*/
 
     pMAIN_LISTBOX = GFX_GOL_ListBoxCreate (
         MAIN_LISTBOX,                   // ID
