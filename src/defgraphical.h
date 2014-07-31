@@ -28,7 +28,7 @@ extern const GFX_GOL_OBJ_SCHEME GOLSchemeDefault;
 #define ID_RADIOBUTTON1   102
 #define ID_RADIOBUTTON2   103
 #define ID_RADIOBUTTON3   104
-#define ID_BOX_TRYING     105
+#define ID_START_CONNECTION     105
 
 /* SwREset Screen object ID's defined here. 150 - 200 */
 

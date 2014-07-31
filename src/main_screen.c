@@ -1,10 +1,12 @@
 
-
 #include <stdio.h>
 #include <stdlib.h>
 #include "gfx/gfx.h"
 #include "system.h"
 #include "main_screen.h"
+
+/* Trying connection options for START button show. */
+extern unsigned int TRYING_CONN;
 
 GFX_GOL_OBJ_SCHEME  mainscheme;          // main scheme
 
@@ -37,6 +39,19 @@ void SetMainScheme()
 //  memcpy(&defscheme, &GOLSchemeDefault, sizeof(GFX_GOL_OBJ_SCHEME));
 }
 
+
+uint16_t CreateStartButton(void)
+{
+  GFX_GOL_BUTTON *pObj;
+  pObj = GFX_GOL_ButtonCreate ( ID_START_CONNECTION, 220, 210, 300, 236, 0,
+    GFX_GOL_BUTTON_DRAW_STATE, NULL, NULL, "START",
+    GFX_ALIGN_HCENTER | GFX_ALIGN_VCENTER, &MAIN_SCHEME );
+
+    if(pObj == NULL)
+        return (0);
+    return 1;
+}
+
 /***************************************************
  * MainScreenCreate(void) Create the application main screen in default scheme.
  * in default scheme.
@@ -45,47 +60,49 @@ void SetMainScheme()
 void MainScreenCreate(void)
 {
     GFX_GOL_STATICTEXT* pMAIN_TERMINAL;
-    GFX_GOL_LISTBOX*    pMAIN_LISTBOX;
 
-    pMAIN_TERMINAL = GFX_GOL_StaticTextCreate (
+    if (!TRYING_CONN)
+    {
+      if (!CreateStartButton()) ErrorCreate(0); 
+    }
+
+    pMAIN_TERMINAL = (GFX_GOL_StaticTextCreate (
         MAIN_TERMINAL,                  // ID
         0, 100, 319, 160,               // dimension
         GFX_GOL_STATICTEXT_DRAW_STATE,  // draw the object
         (GFX_XCHAR*)TerminalBuffer,     // 2 lines of text
         GFX_ALIGN_LEFT | GFX_ALIGN_TOP, // align text on the center
-        &MAIN_SCHEME);                  // use given scheme
-
-    if(pMAIN_TERMINAL == NULL)
-      {
-        ErrorCreate(0);
-      } else
-      {
-        pMAIN_TERMINAL->hdr.actionGet = TerminalActionGet;
-      }
+        &MAIN_SCHEME));
+    if (pMAIN_TERMINAL == NULL)
+    {
+      ErrorCreate(0);
+    }else                  // use given scheme
+    {
+      pMAIN_TERMINAL->hdr.actionGet = TerminalActionGet;
+    }
 
 /*    GFX_GOL_CheckBoxCreate(ID_CONTYPE_BOX, 0, 180, 319, 220, GFX_GOL_CHECKBOX_DRAW_STATE,
         "Scale", GFX_ALIGN_CENTER, &MAIN_SCHEME);*/
 
-    pMAIN_LISTBOX = GFX_GOL_ListBoxCreate (
+    if (GFX_GOL_ListBoxCreate (
         MAIN_LISTBOX,                   // ID
         10, 10, 300, 96,                // dimension
         GFX_GOL_LISTBOX_DRAW_STATE,     // draw the object
         (GFX_XCHAR*)ListBoxDatas,
         GFX_ALIGN_LEFT | GFX_ALIGN_TOP, // align text on the center
-        &MAIN_SCHEME);                  // use given scheme
-
-
-    if(pMAIN_LISTBOX == NULL)
-      {
-        ErrorCreate(0);
-      }
+        &MAIN_SCHEME) == NULL)
+    {
+      ErrorCreate(0);
+    }
 
 // create the list of items to be placed in the listbox
 // Add items (each line will become one item,
 // lines must be separated by 'n' character)
 
-  GFX_GOL_ListBoxItemAdd(pMAIN_LISTBOX, NULL, (GFX_XCHAR*)AddedItem, NULL, 0, 1);
+//  GFX_GOL_ListBoxItemAdd(pMAIN_LISTBOX, NULL, (GFX_XCHAR*)AddedItem, NULL, 0, 1);
   /* Create MAIN button on bottom of screen. */
+
+
 }
 
 GFX_GOL_TRANSLATED_ACTION TerminalActionGet(void* pObject, GFX_GOL_MESSAGE* pMessage)
