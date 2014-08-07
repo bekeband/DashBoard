@@ -8,6 +8,10 @@ GFX_GOL_OBJ_SCHEME  optscheme;          // Options Scheme
 enum E_CONNECT_TYPE CONNECT_TYPE;
 /* Automatic trying connection (infinity). */
 unsigned int TRYING_CONN;
+static GFX_GOL_STATICTEXT* pKLINE_INPUT_TERMINAL = NULL;
+
+static GFX_XCHAR C1[] = "HIGH";
+static GFX_XCHAR C2[] = "LOW";
 
 void SetOptionsScheme()
 {
@@ -32,11 +36,19 @@ void SetOptionsScheme()
 //  memcpy(&defscheme, &GOLSchemeDefault, sizeof(GFX_GOL_OBJ_SCHEME));
 }
 
+GFX_XCHAR* GetHighLowString(bool data)
+{
+  if (data)
+    return C1;
+  else return C2;
+}
+
 uint16_t CreateOptions(void)
 {
   int width = GFX_MaxXGet();
   int height = GFX_TextStringHeightGet(optscheme.pFont);
   uint16_t newstate;
+
 
   if (GFX_GOL_GroupboxCreate(ID_CONTYPE_BOX, 0, 0, width, (height * 2) + 10,
     GFX_GOL_GROUPBOX_DRAW_STATE, "Connection type", GFX_ALIGN_VCENTER,
@@ -82,6 +94,29 @@ uint16_t CreateOptions(void)
     return -1;
   };
 
+  if (GFX_GOL_CheckBoxCreate (ID_TESTKLINE_BUT, 3, (height * 5) + 12, (width / 2), (height * 6) + 20,
+    GFX_GOL_CHECKBOX_DRAW_STATE, "TEST K LINE", GFX_ALIGN_HCENTER | GFX_ALIGN_VCENTER, &optscheme) == NULL)
+  {
+    return -1;
+  }
+
+  pKLINE_INPUT_TERMINAL = (GFX_GOL_StaticTextCreate ( ID_TESTKLINE_INPUT,
+    (width / 2) + 3, (height * 5) + 12, width, (height * 6) + 20, GFX_GOL_STATICTEXT_DRAW_STATE,
+    GetHighLowString(true), GFX_ALIGN_LEFT | GFX_ALIGN_TOP, &optscheme));
+    if (pKLINE_INPUT_TERMINAL == NULL)
+    {
+      return -1;
+    }else                  // use given scheme
+    {
+//      pKLINE_INPUT_TERMINAL->hdr.actionGet = TerminalActionGet;
+    }
+
+    if (GFX_GOL_CheckBoxCreate (ID_TESTKLINE_INPUT, 3, (height * 5) + 12, (width / 2), (height * 6) + 20,
+    GFX_GOL_CHECKBOX_DRAW_STATE, "TEST K LINE", GFX_ALIGN_HCENTER | GFX_ALIGN_VCENTER, &optscheme) == NULL)
+  {
+    return -1;
+  }
+
 /*  newstate = GFX_GOL_CHECKBOX_DRAW_STATE;
   if (TRYING_CONN) newstate |= GFX_GOL_RADIOBUTTON_CHECKED_STATE;
 
@@ -94,10 +129,15 @@ uint16_t CreateOptions(void)
   return 0;
 }
 
-bool     OptionsDrawCallback(void)
+void SetInputString()
 {
-
+  if (pKLINE_INPUT_TERMINAL != NULL)
+  {
+    GFX_GOL_StaticTextSet(pKLINE_INPUT_TERMINAL, GetHighLowString(RXPORT));
+    GFX_GOL_StaticTextDraw(pKLINE_INPUT_TERMINAL);
+  }
 }
+
 
 bool MsgOptionsCallback(GFX_GOL_TRANSLATED_ACTION objMsg, GFX_GOL_OBJ_HEADER *pObject, GFX_GOL_MESSAGE *pMessage)
 {
@@ -130,6 +170,19 @@ bool MsgOptionsCallback(GFX_GOL_TRANSLATED_ACTION objMsg, GFX_GOL_OBJ_HEADER *pO
       {
         TRYING_CONN = 0;
       }
-    };
+    }else
+      if (objectID == ID_TESTKLINE_BUT)
+      {
+        if (objMsg == GFX_GOL_CHECKBOX_ACTION_CHECKED)
+        {
+          TXLAT = 1;
+          SetInputString();
+        } 
+        else if (objMsg == GFX_GOL_CHECKBOX_ACTION_UNCHECKED)
+        {
+          TXLAT = 0;
+          SetInputString();
+        }
+      }
 
 }

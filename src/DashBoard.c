@@ -19,6 +19,12 @@
 #include "defgraphical.h"
 #include "error_screen.h"
 
+/* Tree protocols :
+ * 1. ISO 9141 with 5 baud initialization (init)
+ * 2. KWP with 5 baud init.
+ * 3. KWP with fast init.
+ */
+
 /* tick_tack variable for ticken. */
 bool tick_tack;
 
@@ -95,6 +101,7 @@ bool APP_ObjectDrawCallback(void)
       screenState = CREATE_MAIN_MENU;
       break;
     case CREATE_MAIN_MENU:
+      EnableUART1();
       GFX_GOL_ObjectListFree();
       CreateOptionsButton();
       MainScreenCreate();
@@ -103,6 +110,10 @@ bool APP_ObjectDrawCallback(void)
     case DISPLAY_MAIN_MENU:
       break;
     case CREATE_OPTIONS:
+
+      /* Stop communication. */
+      DisableUART1();
+      TXTRIS = 0; /* UART1TX setting out. */
       GFX_ColorSet(BLUE);
       GFX_ScreenClear();
       APP_CreateMainButton();
@@ -126,6 +137,8 @@ bool APP_ObjectDrawCallback(void)
     default:
       break;
   }
+
+
    return true;
 };
 
@@ -152,7 +165,11 @@ bool APP_ObjectMessageCallback( GFX_GOL_TRANSLATED_ACTION objectMessage,
           screenState = CREATE_OPTIONS;
           LED_RED_02_LAT() = !(LED_RED_02_PORT());
         };
+      } else if ((objectMessage == GFX_GOL_BUTTON_ACTION_RELEASED) && (objID == ID_START_CONNECTION))
+      {
+        U1TXREG = 0x55;
       }
+
     break;
     case DISPLAY_SWRESET:
  
@@ -171,6 +188,12 @@ bool APP_ObjectMessageCallback( GFX_GOL_TRANSLATED_ACTION objectMessage,
       break;
     default: break;
   };
+
+}
+
+void CommTask()
+{
+
 }
 
 int TickGetMessage(GFX_GOL_MESSAGE* msg)
@@ -180,6 +203,7 @@ int TickGetMessage(GFX_GOL_MESSAGE* msg)
     msg->type = TYPE_TIMER;
     msg->uiEvent = EVENT_SET;
     tick_tack = false;
+
   } else
   {
     msg->uiEvent = EVENT_INVALID;
@@ -221,15 +245,13 @@ int main(int argc, char** argv) {
         if(GFX_GOL_ObjectListDraw() == GFX_STATUS_SUCCESS)
         {
           TouchGetMsg(&msg);                // Get message from touch screen
-/*          msg.uiEvent = EVENT_RELEASE;
-          msg.param1 = 190;
-          msg.param2 = 10;*/
 
           /* If is not touch message, then get tick message. */
-/*          if (msg.uiEvent == EVENT_INVALID)
+          if (msg.uiEvent == EVENT_INVALID)
           {
+
             TickGetMessage(&msg);
-          }*/
+          }
           GFX_GOL_ObjectMessage(&msg);      // Process message
         }
     }

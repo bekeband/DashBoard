@@ -102,6 +102,9 @@ void SYSTEM_TickInit(void);
 *********************************************************************/
 void SYSTEM_ProgramExternalMemory();
 
+void DisableUART1();
+void EnableUART1();
+
 typedef enum
 {
     ANSEL_DIGITAL = 0,

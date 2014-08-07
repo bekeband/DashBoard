@@ -30,6 +30,10 @@ extern const GFX_GOL_OBJ_SCHEME GOLSchemeDefault;
 #define ID_RADIOBUTTON3   104
 #define ID_START_CONNECTION     105
 
+/* Test K-Line button */
+#define ID_TESTKLINE_BUT      106
+#define ID_TESTKLINE_INPUT    107
+
 /* SwREset Screen object ID's defined here. 150 - 200 */
 
 #define ID_CLEAR_BUTTON 150
