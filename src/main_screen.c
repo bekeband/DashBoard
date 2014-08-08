@@ -14,7 +14,7 @@ int number = 0;
 
 GFX_XCHAR TerminalBuffer[TERMINAL_BUFFER_SIZE] = "Terminal buffer   ";
 GFX_XCHAR ListBoxDatas[] = "FirstItem\nSecond Item\nThird Item";
-GFX_XCHAR AddedItem[] = "Added Item\nMore add Item";
+//GFX_XCHAR AddedItem[] = "Added Item\nMore add Item";
 
 void SetMainScheme()
 {
@@ -111,7 +111,7 @@ GFX_GOL_TRANSLATED_ACTION TerminalActionGet(void* pObject, GFX_GOL_MESSAGE* pMes
   {
 //    LED_YELLOW_02_LAT() = !(LED_YELLOW_02_PORT());
     utoa(ubuf, number, 10);
-    memcpy(((char*)&TerminalBuffer) + 16, (char*)ubuf, 2);
+//    memcpy(((char*)&TerminalBuffer) + 16, (char*)ubuf, 2);
     number++;
     GFX_GOL_STATICTEXT *pSt;
     pSt = (GFX_GOL_STATICTEXT *)pObject;

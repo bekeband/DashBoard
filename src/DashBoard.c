@@ -19,6 +19,8 @@
 #include "defgraphical.h"
 #include "error_screen.h"
 
+extern GFX_XCHAR* TerminalBuffer;
+
 /* Tree protocols :
  * 1. ISO 9141 with 5 baud initialization (init)
  * 2. KWP with 5 baud init.
@@ -142,10 +144,15 @@ bool APP_ObjectDrawCallback(void)
    return true;
 };
 
+const char INITBUF[5] = {0xC1, 0x33, 0xF1, 0x81, 0x66};
+char RESPONSE[7];
+
+
 bool APP_ObjectMessageCallback( GFX_GOL_TRANSLATED_ACTION objectMessage,
   GFX_GOL_OBJ_HEADER* pObject, GFX_GOL_MESSAGE* pMessage)
 {
   uint16_t objID;
+  int i; int RB;
 
   objID = GFX_GOL_ObjectIDGet(pObject);
 
@@ -167,7 +174,38 @@ bool APP_ObjectMessageCallback( GFX_GOL_TRANSLATED_ACTION objectMessage,
         };
       } else if ((objectMessage == GFX_GOL_BUTTON_ACTION_RELEASED) && (objID == ID_START_CONNECTION))
       {
-        U1TXREG = 0x55;
+        
+#ifndef K_LINE_LOOPBACK
+        U1STAbits.URXEN = 0;
+#endif
+        for (i = 0; i < 4; i++)
+        {
+          while (U1STAbits.UTXBF);
+          U1TXREG = INITBUF[i];
+        }
+#ifndef K_LINE_LOOPBACK
+        RB = 7;
+        U1STAbits.URXEN = 1;
+#else
+        RB = 4;
+#endif
+
+        for (i = 0; i < RB; i++)
+        {
+//          while (U1STAbits.URXDA);
+          RESPONSE[i] = U1RXREG;
+        }
+
+        for (i = 0; i < 4; i++)
+        {
+//          utoa(ubuf, number, 10);
+//          memcpy(((char*)&TerminalBuffer) + 16, (char*)ubuf, 2);
+        }
+      strcpy(((char*)&TerminalBuffer), "Nincs terminal");
+
+      pMessage->type = TYPE_TIMER;
+      pMessage->uiEvent = EVENT_SET;
+
       }
 
     break;
@@ -250,7 +288,7 @@ int main(int argc, char** argv) {
           if (msg.uiEvent == EVENT_INVALID)
           {
 
-            TickGetMessage(&msg);
+//            TickGetMessage(&msg);
           }
           GFX_GOL_ObjectMessage(&msg);      // Process message
         }
