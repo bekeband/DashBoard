@@ -18,6 +18,7 @@
 #include "peripheral/reset.h"
 #include "defgraphical.h"
 #include "error_screen.h"
+#include "serial.h"
 
 extern GFX_XCHAR* TerminalBuffer;
 
@@ -170,7 +171,6 @@ bool APP_ObjectMessageCallback( GFX_GOL_TRANSLATED_ACTION objectMessage,
         {
           GFX_GOL_ObjectListFree();
           screenState = CREATE_OPTIONS;
-          LED_RED_02_LAT() = !(LED_RED_02_PORT());
         };
       } else if ((objectMessage == GFX_GOL_BUTTON_ACTION_RELEASED) && (objID == ID_START_CONNECTION))
       {
@@ -178,11 +178,7 @@ bool APP_ObjectMessageCallback( GFX_GOL_TRANSLATED_ACTION objectMessage,
 #ifndef K_LINE_LOOPBACK
         U1STAbits.URXEN = 0;
 #endif
-        for (i = 0; i < 4; i++)
-        {
-          while (U1STAbits.UTXBF);
-          U1TXREG = INITBUF[i];
-        }
+        WriteString("Welcome for bandi propagate inflate hoist ballon.");
 #ifndef K_LINE_LOOPBACK
         RB = 7;
         U1STAbits.URXEN = 1;
@@ -190,17 +186,6 @@ bool APP_ObjectMessageCallback( GFX_GOL_TRANSLATED_ACTION objectMessage,
         RB = 4;
 #endif
 
-        for (i = 0; i < RB; i++)
-        {
-//          while (U1STAbits.URXDA);
-          RESPONSE[i] = U1RXREG;
-        }
-
-        for (i = 0; i < 4; i++)
-        {
-//          utoa(ubuf, number, 10);
-//          memcpy(((char*)&TerminalBuffer) + 16, (char*)ubuf, 2);
-        }
       strcpy(((char*)&TerminalBuffer), "Nincs terminal");
 
       pMessage->type = TYPE_TIMER;
@@ -257,6 +242,7 @@ int main(int argc, char** argv) {
   INTEnableInterrupts();
     // step 1: Initialize board, drivers and graphics library
   SYSTEM_InitializeBoard();
+  InitUART1();
   GFX_Initialize();
 
 

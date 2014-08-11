@@ -85,6 +85,9 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
  **********************************************************************/
 #define FCY             (SYS_CLK_FrequencyInstructionGet())
 
+/* for UART programming. */
+#define	GetPeripheralClock()		(SYS_CLK_FrequencySystemGet()/(1 << OSCCONbits.PBDIV))
+
 //#include <libpic30.h>
 
 /*********************************************************************
@@ -101,9 +104,6 @@ void SYSTEM_TickInit(void);
 * External Memory Programming
 *********************************************************************/
 void SYSTEM_ProgramExternalMemory();
-
-void DisableUART1();
-void EnableUART1();
 
 typedef enum
 {

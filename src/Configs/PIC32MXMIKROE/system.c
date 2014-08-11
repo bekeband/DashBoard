@@ -93,42 +93,6 @@ extern bool tick_tack;
 */
 // *****************************************************************************
 
-void EnableUART1()
-{
-  /* RX-TX enable. */
-  U1STAbits.URXEN = 1;
-  U1STAbits.UTXEN = 1;
-  /* Start UART1. */
-  U1MODEbits.ON = 1;
-}
-
-void DisableUART1()
-{
-  /* Stop UART1. */
-  U1MODEbits.ON = 0;
-}
-
-/* UART signaling at 10.4K baud, 8 data bits, no parity, 1 stop */
-
-void InitUART1()
-{
-
-  U1BRG = 60000;
-  /* Baud Ryte = 10.4 kBaud.
-   * (40000000/(16*10400))-1 */
-//  U1BRG = 239;
-  /* Clear MODE register */
-  U1MODE = 0;
-  /* Stop UART1. */
-  U1MODEbits.ON = 0;
-
-  /* Clear STA register. */
-  U1STA = 0;
-
-  EnableUART1();
-  
-}
-
 void SYSTEM_InitializeBoard(void)
 {
     const DRV_SPI_INIT_DATA SPI_Init_Data = {2, 3, 7, 0, SPI_BUS_MODE_3, 0};
@@ -171,7 +135,6 @@ void SYSTEM_InitializeBoard(void)
     TouchInit(NVMWrite, NVMRead, NVMSectorErase, NULL);
 //    TouchInit(NULL, NULL, NULL, NULL);
 
-    InitUART1();
 }
 
 // *****************************************************************************
