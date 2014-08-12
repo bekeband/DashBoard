@@ -4,7 +4,7 @@
 #include <plib.h>
 
 static uint8_t TXBUFFER[TX_BUFFER_SIZE];
-static uint8_t RXBUFFER[RX_BUFFER_SIZE];
+//static uint8_t RXBUFFER[RX_BUFFER_SIZE];
 
 static int TXBUFFER_PTR;
 static int RXBUFFER_PTR;
@@ -21,6 +21,8 @@ void InitUART1()
   INTEnable(INT_SOURCE_UART_RX(UART_MODULE_ID), INT_ENABLED);
   INTSetVectorPriority(INT_VECTOR_UART(UART_MODULE_ID), INT_PRIORITY_LEVEL_2);
   INTSetVectorSubPriority(INT_VECTOR_UART(UART_MODULE_ID), INT_SUB_PRIORITY_LEVEL_0);
+  RXBUFFER_PTR = 0;
+  TXBUFFER_PTR = 0;
 }
 
 
@@ -40,7 +42,7 @@ void PutCharacter(const char character)
 void WriteString(const char *string)
 {
 
-  PORTDbits.RD0 = 0;
+//  PORTDbits.RD0 = 0;
     while(*string != '\0')
     {
         while(!UARTTransmitterIsReady(UART_MODULE_ID))
@@ -52,8 +54,33 @@ void WriteString(const char *string)
 
         while(!UARTTransmissionHasCompleted(UART_MODULE_ID)) ;
     }
-  PORTDbits.RD0 = 1;
+//  PORTDbits.RD0 = 1;
 }
+
+void WriteBuffer(const char *buffer, int size)
+{ int i;
+
+//  PORTDbits.RD0 = 0;
+for (i = 0; i < size; i++)
+    {
+        while(!UARTTransmitterIsReady(UART_MODULE_ID))
+            ;
+
+        UARTSendDataByte(UART_MODULE_ID, *buffer);
+
+        buffer++;
+
+        while(!UARTTransmissionHasCompleted(UART_MODULE_ID)) ;
+    }
+//  PORTDbits.RD0 = 1;
+}
+
+void ClearUART1Errors()
+{
+  
+}
+
+int RCDATA;
 
 /* Serial interrupt program for RX characters. */
 
@@ -62,6 +89,13 @@ void __ISR(_UART_1_VECTOR, ipl2) IntUart1Handler(void)
 	// Is this an RX interrupt?
 	if(INTGetFlag(INT_SOURCE_UART_RX(UART_MODULE_ID)))
 	{
+    if (RXBUFFER_PTR < RX_BUFFER_SIZE)
+    {
+      RXBUFFER[RXBUFFER_PTR++] = U1RXREG;
+    }
+
+    /* Received character */
+    mPORTDToggleBits(BIT_2);
     // Clear the RX interrupt Flag
 	  INTClearFlag(INT_SOURCE_UART_RX(UART_MODULE_ID));
 
@@ -69,7 +103,7 @@ void __ISR(_UART_1_VECTOR, ipl2) IntUart1Handler(void)
 //      PutCharacter(UARTGetDataByte(UART_MODULE_ID));
 
       // Toggle LED to indicate UART activity
-      LED_RED_02_LAT() = !(LED_RED_02_PORT());
+
 	}
 
 	// We don't care about TX interrupt
@@ -77,6 +111,7 @@ void __ISR(_UART_1_VECTOR, ipl2) IntUart1Handler(void)
 	{
     INTClearFlag(INT_SOURCE_UART_TX(UART_MODULE_ID));
 	}
+//  if (INTgetFlag())
 }
 
 void DisableUART1()

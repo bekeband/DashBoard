@@ -178,15 +178,15 @@ bool APP_ObjectMessageCallback( GFX_GOL_TRANSLATED_ACTION objectMessage,
 #ifndef K_LINE_LOOPBACK
         U1STAbits.URXEN = 0;
 #endif
-        WriteString("Welcome for bandi propagate inflate hoist ballon.");
+        WriteBuffer(INITBUF, 5);
 #ifndef K_LINE_LOOPBACK
         RB = 7;
         U1STAbits.URXEN = 1;
 #else
         RB = 4;
 #endif
-
-      strcpy(((char*)&TerminalBuffer), "Nincs terminal");
+      sprintf(((char*)&TerminalBuffer), "RD DATAS %X %X %X %X %X", RXBUFFER[0],
+        RXBUFFER[1], RXBUFFER[2], RXBUFFER[3], RXBUFFER[4]);
 
       pMessage->type = TYPE_TIMER;
       pMessage->uiEvent = EVENT_SET;

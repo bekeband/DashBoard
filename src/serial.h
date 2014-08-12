@@ -18,7 +18,9 @@
 
 void InitUART1();
 void WriteString(const char *string);
+void WriteBuffer(const char *buffer, int size);
 void DisableUART1();
 void EnableUART1();
+uint8_t RXBUFFER[RX_BUFFER_SIZE];
 
 #endif
