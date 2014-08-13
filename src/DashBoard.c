@@ -145,6 +145,28 @@ bool APP_ObjectDrawCallback(void)
    return true;
 };
 
+/* Wake UP ECU for slow, or fast init procedure. */
+
+void WakeUpECU()
+{ /* Now fast init wake up. Not  5 baud initialize. */
+  DisableUART1();
+  TXTRIS = 0; /* TX port set output, */
+  TXLAT = 0;
+  /* Starting time for. */
+  __delay_ms(300);
+  __delay_ms(300);
+  __delay_ms(300);
+  TXLAT = 1;  
+  __delay_ms(25);
+  TXLAT = 0;  
+  __delay_ms(25);
+  /* Then anable UART TX RX to send to initialize data. */
+  EnableUART1();
+}
+
+/*
+ */
+
 const char INITBUF[5] = {0xC1, 0x33, 0xF1, 0x81, 0x66};
 char RESPONSE[7];
 
@@ -178,18 +200,33 @@ bool APP_ObjectMessageCallback( GFX_GOL_TRANSLATED_ACTION objectMessage,
 #ifndef K_LINE_LOOPBACK
         U1STAbits.URXEN = 0;
 #endif
+        /* Wake up ECU to 25 ms K line tick-tack.  */
+        WakeUpECU();
+        /* Write buffer the start communication message. */
+
         WriteBuffer(INITBUF, 5);
+        
 #ifndef K_LINE_LOOPBACK
         RB = 7;
         U1STAbits.URXEN = 1;
 #else
         RB = 4;
 #endif
-      sprintf(((char*)&TerminalBuffer), "RD DATAS %X %X %X %X %X", RXBUFFER[0],
-        RXBUFFER[1], RXBUFFER[2], RXBUFFER[3], RXBUFFER[4]);
+
+        __delay_ms(300);
+        __delay_ms(300);
+        __delay_ms(300);
+        __delay_ms(300);
+
+      sprintf(((char*)&TerminalBuffer), "RD DATAS %X %X %X %X %X %X %X %X\n %X %X %X %X %X %X %X %X", RXBUFFER[0],
+        RXBUFFER[1], RXBUFFER[2], RXBUFFER[3], RXBUFFER[4], RXBUFFER[5], RXBUFFER[6],
+        RXBUFFER[7], RXBUFFER[8], RXBUFFER[9], RXBUFFER[10], RXBUFFER[11], RXBUFFER[12],
+        RXBUFFER[13], RXBUFFER[14], RXBUFFER[15]);
+
 
       pMessage->type = TYPE_TIMER;
       pMessage->uiEvent = EVENT_SET;
+      ClearRXBuffer();
 
       }
 

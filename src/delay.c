@@ -2,7 +2,7 @@
 #include <plib.h>
 #include "delay.h"
 
-void delay(uint16_t period)
+void delay(uint32_t period)
 {
 /*  IFS0bits.T3IF = 0;
   OpenTimer23(T23_ON | T23_IDLE_CON | T23_PS_1_256 | T23_SOURCE_INT, period);

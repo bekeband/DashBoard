@@ -9,10 +9,19 @@ static uint8_t TXBUFFER[TX_BUFFER_SIZE];
 static int TXBUFFER_PTR;
 static int RXBUFFER_PTR;
 
+void ClearRXBuffer()
+{ int i;
+  RXBUFFER_PTR = 0;
+  TXBUFFER_PTR = 0;
+  for (i = 0; i < RX_BUFFER_SIZE; i++)
+  {
+    RXBUFFER[i] = 0;
+  }
+}
 
 void InitUART1()
-{
-  UARTConfigure(UART_MODULE_ID, UART_ENABLE_PINS_TX_RX_ONLY);
+{ 
+  UARTConfigure(UART_MODULE_ID, UART_ENABLE_PINS_TX_RX_ONLY | UART_INVERT_TRANSMIT_POLARITY | UART_INVERT_RECEIVE_POLARITY);
   UARTSetFifoMode(UART_MODULE_ID, UART_INTERRUPT_ON_TX_NOT_FULL | UART_INTERRUPT_ON_RX_NOT_EMPTY);
   UARTSetLineControl(UART_MODULE_ID, UART_DATA_SIZE_8_BITS | UART_PARITY_NONE | UART_STOP_BITS_1);
   UARTSetDataRate(UART_MODULE_ID, GetPeripheralClock(), DESIRED_BAUDRATE);
@@ -21,10 +30,8 @@ void InitUART1()
   INTEnable(INT_SOURCE_UART_RX(UART_MODULE_ID), INT_ENABLED);
   INTSetVectorPriority(INT_VECTOR_UART(UART_MODULE_ID), INT_PRIORITY_LEVEL_2);
   INTSetVectorSubPriority(INT_VECTOR_UART(UART_MODULE_ID), INT_SUB_PRIORITY_LEVEL_0);
-  RXBUFFER_PTR = 0;
-  TXBUFFER_PTR = 0;
+  ClearRXBuffer();
 }
-
 
 void PutCharacter(const char character)
 {
@@ -79,8 +86,6 @@ void ClearUART1Errors()
 {
   
 }
-
-int RCDATA;
 
 /* Serial interrupt program for RX characters. */
 
