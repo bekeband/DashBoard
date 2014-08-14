@@ -3,11 +3,26 @@
 #include "serial.h"
 #include <plib.h>
 
-static uint8_t TXBUFFER[TX_BUFFER_SIZE];
-//static uint8_t RXBUFFER[RX_BUFFER_SIZE];
+uint8_t TXBUFFER[TX_BUFFER_SIZE];
+uint8_t RXBUFFER[RX_BUFFER_SIZE];
 
-static int TXBUFFER_PTR;
-static int RXBUFFER_PTR;
+int TXBUFFER_PTR;
+int RXBUFFER_PTR;
+
+uint8_t data_size;
+
+enum e_rxstate rxstate = init_comm;
+
+uint8_t* GetRXBuffer()
+{
+  return (uint8_t*)&RXBUFFER;
+}
+
+/* Format a byte array to hex string. */
+int Format8bytesforhex(char* bstring, uint8_t* bstart)
+{
+  sprintf(bstring, "%2X %2X %2X %2X %2X %2X %2X %2X", bstart[0],bstart[1], bstart[2], bstart[3], bstart[4], bstart[5], bstart[6], bstart[7]);
+}
 
 void ClearRXBuffer()
 { int i;
@@ -94,6 +109,18 @@ void __ISR(_UART_1_VECTOR, ipl2) IntUart1Handler(void)
 	// Is this an RX interrupt?
 	if(INTGetFlag(INT_SOURCE_UART_RX(UART_MODULE_ID)))
 	{
+    switch (rxstate)
+    {
+      case init_comm:
+      {
+        /* It seems format byte ? */
+        if ((U1RXREG > 0x80) && (U1RXREG < 0x88))
+        { /* save datasize for future. */
+          data_size = U1RXREG - 0x80;
+        }
+      }
+    };
+
     if (RXBUFFER_PTR < RX_BUFFER_SIZE)
     {
       RXBUFFER[RXBUFFER_PTR++] = U1RXREG;

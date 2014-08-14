@@ -21,7 +21,20 @@ void WriteString(const char *string);
 void WriteBuffer(const char *buffer, int size);
 void DisableUART1();
 void EnableUART1();
-uint8_t RXBUFFER[RX_BUFFER_SIZE];
+uint8_t* GetRXBuffer();
+int GetRXBufferInHex(char* string, int max_size);
 void ClearRXBuffer();
+
+enum e_rxstate {
+  init_comm,
+  comm_comm
+};
+
+enum e_init_state {
+  format_byte,
+  target_address,
+  source_address,
+  service_ID
+};
 
 #endif

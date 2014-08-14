@@ -12,6 +12,8 @@ GFX_GOL_OBJ_SCHEME  mainscheme;          // main scheme
 
 int number = 0;
 
+/* DEBUG terminal for chacking the communication traffic. */
+GFX_GOL_STATICTEXT* pDEBUG_TERMINAL;
 GFX_XCHAR TerminalBuffer[TERMINAL_BUFFER_SIZE] = "Terminal buffer   ";
 GFX_XCHAR ListBoxDatas[] = "FirstItem\nSecond Item\nThird Item";
 //GFX_XCHAR AddedItem[] = "Added Item\nMore add Item";
@@ -59,26 +61,25 @@ uint16_t CreateStartButton(void)
  **************************************************/
 void MainScreenCreate(void)
 {
-    GFX_GOL_STATICTEXT* pMAIN_TERMINAL;
 
     if (!TRYING_CONN)
     {
       if (!CreateStartButton()) ErrorCreate(0); 
     }
 
-    pMAIN_TERMINAL = (GFX_GOL_StaticTextCreate (
+    pDEBUG_TERMINAL = (GFX_GOL_StaticTextCreate (
         MAIN_TERMINAL,                  // ID
         0, 100, 319, 160,               // dimension
         GFX_GOL_STATICTEXT_DRAW_STATE,  // draw the object
         (GFX_XCHAR*)TerminalBuffer,     // 2 lines of text
         GFX_ALIGN_LEFT | GFX_ALIGN_TOP, // align text on the center
         &MAIN_SCHEME));
-    if (pMAIN_TERMINAL == NULL)
+    if (pDEBUG_TERMINAL == NULL)
     {
       ErrorCreate(0);
     }else                  // use given scheme
     {
-      pMAIN_TERMINAL->hdr.actionGet = TerminalActionGet;
+      pDEBUG_TERMINAL->hdr.actionGet = TerminalActionGet;
     }
 
 /*    GFX_GOL_CheckBoxCreate(ID_CONTYPE_BOX, 0, 180, 319, 220, GFX_GOL_CHECKBOX_DRAW_STATE,

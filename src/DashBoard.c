@@ -168,7 +168,6 @@ void WakeUpECU()
  */
 
 const char INITBUF[5] = {0xC1, 0x33, 0xF1, 0x81, 0x66};
-char RESPONSE[7];
 
 
 bool APP_ObjectMessageCallback( GFX_GOL_TRANSLATED_ACTION objectMessage,
@@ -217,12 +216,13 @@ bool APP_ObjectMessageCallback( GFX_GOL_TRANSLATED_ACTION objectMessage,
         __delay_ms(300);
         __delay_ms(300);
         __delay_ms(300);
+      uint8_t* RXBufferPtr;
 
-      sprintf(((char*)&TerminalBuffer), "RD DATAS %X %X %X %X %X %X %X %X\n %X %X %X %X %X %X %X %X", RXBUFFER[0],
-        RXBUFFER[1], RXBUFFER[2], RXBUFFER[3], RXBUFFER[4], RXBUFFER[5], RXBUFFER[6],
-        RXBUFFER[7], RXBUFFER[8], RXBUFFER[9], RXBUFFER[10], RXBUFFER[11], RXBUFFER[12],
-        RXBUFFER[13], RXBUFFER[14], RXBUFFER[15]);
-
+      if (pDEBUG_TERMINAL)
+      {
+        RXBufferPtr = GetRXBuffer();
+        Format8bytesforhex((char*)&TerminalBuffer, RXBufferPtr);
+      }
 
       pMessage->type = TYPE_TIMER;
       pMessage->uiEvent = EVENT_SET;
