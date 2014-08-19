@@ -100,6 +100,12 @@ void SYSTEM_InitializeBoard(void);
 // *****************************************************************************
 void SYSTEM_TickInit(void);
 
+void ResetTick();
+int GetTickValue();
+void SetTimeout(int newvalue);
+bool GetTimeout();
+void StartTimeout();
+
 /*********************************************************************
 * External Memory Programming
 *********************************************************************/

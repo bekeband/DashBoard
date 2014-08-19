@@ -74,7 +74,11 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // *****************************************************************************
 // System Settings and Variables
 // *****************************************************************************
+
 volatile int  tick = 0; // tick counter,
+volatile int timeout;
+volatile int timeout_value;
+bool time_elapsed;
 extern bool tick_tack;
 
 // *****************************************************************************
@@ -124,6 +128,7 @@ void SYSTEM_InitializeBoard(void)
     // ---------------------------------------------------------
     // Initialize the Display Driver
     // ---------------------------------------------------------
+
     DRV_GFX_Initialize();
 
     DRV_NVM_M25P80_Initialize((DRV_SPI_INIT_DATA*)&SPI_Init_Data);
@@ -175,18 +180,24 @@ void __attribute__((interrupt,auto_psv)) _USB1Interrupt()
 void __ISR(_TIMER_3_VECTOR, ipl1) _T3Interrupt(void)
 {
     tick++;
-
+    if (!time_elapsed)
+    {
+      if (timeout_value++ >= timeout)
+      {
+        time_elapsed = true;
+      }
+    };
     TMR3 = 0;
     // Clear flag
     IFS0bits.T3IF = 0;
     TouchDetectPosition();
     /* Test tick for interrupt, and else functions test. */
-    if (tick == 5000)
+/*    if (tick == 5000)
     {
       tick_tack = true;
       LED_YELLOW_01_LAT() = !(LED_YELLOW_01_PORT());
       tick = 0;
-    }
+    }*/
 }
 
 /*********************************************************************
@@ -201,20 +212,41 @@ void __ISR(_TIMER_3_VECTOR, ipl1) _T3Interrupt(void)
 // *****************************************************************************
 /*  Function:
     void SYSTEM_TickInit(void)
-
-    Summary:
-        Initializes the tick timer of the demo.
-
-    Description:
-        This function initializes the tick timer of the demo.
-
-*/
-// *****************************************************************************
+    Initialize Timer3 timer for 500usec system timer
+    *****************************************************************************/
 void SYSTEM_TickInit(void)
 {
   OpenTimer3(T3_ON | T3_PS_1_256, TICK_PERIOD);
   ConfigIntTimer3(T3_INT_ON | T3_INT_PRIOR_1);
 }
+
+void ResetTick()
+{
+  tick = 0;
+}
+
+int GetTickValue()
+{
+  return tick;
+}
+
+void SetTimeout(int newvalue)
+{
+  time_elapsed = true;
+  timeout_value = 0;
+  timeout = (newvalue * 2);
+}
+
+void StartTimeout()
+{
+  time_elapsed = false;
+}
+
+bool GetTimeout()
+{
+  return (time_elapsed);
+}
+
 
 // *****************************************************************************
 /*  Function:

@@ -169,7 +169,6 @@ void WakeUpECU()
 
 const char INITBUF[5] = {0xC1, 0x33, 0xF1, 0x81, 0x66};
 
-
 bool APP_ObjectMessageCallback( GFX_GOL_TRANSLATED_ACTION objectMessage,
   GFX_GOL_OBJ_HEADER* pObject, GFX_GOL_MESSAGE* pMessage)
 {
@@ -203,7 +202,7 @@ bool APP_ObjectMessageCallback( GFX_GOL_TRANSLATED_ACTION objectMessage,
         WakeUpECU();
         /* Write buffer the start communication message. */
 
-        WriteBuffer(INITBUF, 5);
+//        WriteBuffer(INITBUF, 7);
         
 #ifndef K_LINE_LOOPBACK
         RB = 7;
@@ -277,11 +276,15 @@ int main(int argc, char** argv) {
 
   INTEnableSystemMultiVectoredInt();
   INTEnableInterrupts();
+
+    /* Initialize the system 500usec timer for delay, and more. */
+  SYSTEM_TickInit();
+
     // step 1: Initialize board, drivers and graphics library
   SYSTEM_InitializeBoard();
+
   InitUART1();
   GFX_Initialize();
-
 
     /* Software reset occurs ?*/
     // set the message callback function pointer

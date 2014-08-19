@@ -11,7 +11,12 @@ int RXBUFFER_PTR;
 
 uint8_t data_size;
 
-enum e_rxstate rxstate = init_comm;
+uint8_t ECU_ADDR;
+
+uint16_t KEYWORD;
+
+enum e_rxstate rxstate = init_start;
+enum e_OBD_error OBD_ERROR = none;
 
 uint8_t* GetRXBuffer()
 {
@@ -102,6 +107,15 @@ void ClearUART1Errors()
   
 }
 
+bool CRCTest(int size, uint8_t* buffer, uint8_t TestCRC)
+{ int i; uint8_t sum = 0;
+  for (i = 0; i < size; i++)
+  {
+    sum += buffer[i];
+  }
+  return (TestCRC == sum);
+}
+
 /* Serial interrupt program for RX characters. */
 
 void __ISR(_UART_1_VECTOR, ipl2) IntUart1Handler(void)
@@ -109,22 +123,71 @@ void __ISR(_UART_1_VECTOR, ipl2) IntUart1Handler(void)
 	// Is this an RX interrupt?
 	if(INTGetFlag(INT_SOURCE_UART_RX(UART_MODULE_ID)))
 	{
+    unsigned char nextchar;
+    nextchar = U1RXREG;
     switch (rxstate)
     {
-      case init_comm:
+      case init_start:
       {
+
         /* It seems format byte ? */
-        if ((U1RXREG > 0x80) && (U1RXREG < 0x88))
+        if ((nextchar > 0x80) && (nextchar < 0x88))
         { /* save datasize for future. */
-          data_size = U1RXREG - 0x80;
+          SetTimeout(INIT_TIMEOUT);
+          data_size = nextchar - 0x80;
+          RXBUFFER_PTR = 0;
+          StartTimeout();
+          rxstate = init_read;
+        };
+
+      }break;
+      /* read init command from ECU. */
+      case init_read:
+      {
+        if (!GetTimeout())
+        {
+          if (RXBUFFER_PTR < (INIT_RESPOND_SIZE - 1))
+          {
+            RXBUFFER[RXBUFFER_PTR++] = U1RXREG;
+          }else
+            /* Get data_size + 3 bytes, perhaps init communication end. */
+          {
+            if (CRCTest(RXBUFFER_PTR - 1, RXBUFFER, RXBUFFER[RXBUFFER_PTR]))
+            {/* CRC OK*/
+              if ((RXBUFFER[0] == TESTER_ADDR) && (RXBUFFER[2] == FORMAT_BYTE))
+              { /* Store ECU address. */
+                ECU_ADDR = RXBUFFER[1];
+                KEYWORD = RXBUFFER[3] + (RXBUFFER[4] * 256);
+                if (KEYWORD == KEY_ISO14230_4)
+                { /* Initialization OK...*/
+
+                } else
+                {
+                  OBD_ERROR = invalid_keyword;
+                  rxstate = init_start;
+                }
+              }
+            } else
+            {
+              OBD_ERROR = CRC;
+              rxstate = init_start;
+            }
+          }
+        } else
+          /* Timeout error. */
+        {
+          OBD_ERROR = timeout;
+          rxstate = init_start;
         }
-      }
+
+      }break;
+
     };
 
-    if (RXBUFFER_PTR < RX_BUFFER_SIZE)
+/*    if (RXBUFFER_PTR < RX_BUFFER_SIZE)
     {
       RXBUFFER[RXBUFFER_PTR++] = U1RXREG;
-    }
+    }*/
 
     /* Received character */
     mPORTDToggleBits(BIT_2);
