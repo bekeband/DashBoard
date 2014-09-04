@@ -46,14 +46,14 @@ typedef enum
   DISPLAY_SWRESET,
 } APP_SCREEN_STATES;
 
-typedef enum
+/*typedef enum
 {
   INIT,
   START
-} CONNECT_STATES;
+} CONNECT_STATES;*/
 
 APP_SCREEN_STATES   screenState;
-CONNECT_STATES      connectState;
+//CONNECT_STATES      connectState;
 
 /* APP_createMainButton(void)
  * Create main button for main screen reach at all program state.
@@ -145,30 +145,6 @@ bool APP_ObjectDrawCallback(void)
    return true;
 };
 
-/* Wake UP ECU for slow, or fast init procedure. */
-
-void WakeUpECU()
-{ /* Now fast init wake up. Not  5 baud initialize. */
-  DisableUART1();
-  TXTRIS = 0; /* TX port set output, */
-  TXLAT = 0;
-  /* Starting time for. */
-  __delay_ms(300);
-  __delay_ms(300);
-  __delay_ms(300);
-  TXLAT = 1;  
-  __delay_ms(25);
-  TXLAT = 0;  
-  __delay_ms(25);
-  /* Then anable UART TX RX to send to initialize data. */
-  EnableUART1();
-}
-
-/*
- */
-
-const char INITBUF[5] = {0xC1, 0x33, 0xF1, 0x81, 0x66};
-
 bool APP_ObjectMessageCallback( GFX_GOL_TRANSLATED_ACTION objectMessage,
   GFX_GOL_OBJ_HEADER* pObject, GFX_GOL_MESSAGE* pMessage)
 {
@@ -194,27 +170,18 @@ bool APP_ObjectMessageCallback( GFX_GOL_TRANSLATED_ACTION objectMessage,
         };
       } else if ((objectMessage == GFX_GOL_BUTTON_ACTION_RELEASED) && (objID == ID_START_CONNECTION))
       {
+//        if (GFX_GOL_ObjectStateGet(pObject, GFX_GOL_BUTTON_PRESSED_STATE))
+        {
         
-#ifndef K_LINE_LOOPBACK
-        U1STAbits.URXEN = 0;
-#endif
-        /* Wake up ECU to 25 ms K line tick-tack.  */
-        WakeUpECU();
-        /* Write buffer the start communication message. */
+          /* Wake up ECU to 25 ms K line tick-tack.  */
+          MakeUpEQU();
+//          WakeUpECU();
+          /* Write buffer the start communication message. */
+//          WriteInit();
+        };
+/*        __delay_ms(300);
+        __delay_ms(300);
 
-//        WriteBuffer(INITBUF, 7);
-        
-#ifndef K_LINE_LOOPBACK
-        RB = 7;
-        U1STAbits.URXEN = 1;
-#else
-        RB = 4;
-#endif
-
-        __delay_ms(300);
-        __delay_ms(300);
-        __delay_ms(300);
-        __delay_ms(300);
       uint8_t* RXBufferPtr;
 
       if (pDEBUG_TERMINAL)
@@ -225,11 +192,9 @@ bool APP_ObjectMessageCallback( GFX_GOL_TRANSLATED_ACTION objectMessage,
 
       pMessage->type = TYPE_TIMER;
       pMessage->uiEvent = EVENT_SET;
-      ClearRXBuffer();
+      ClearRXBuffer();*/
 
-      }
-
-    break;
+      } break;
     case DISPLAY_SWRESET:
  
     case DISPLAY_OPTIONS:
@@ -250,10 +215,7 @@ bool APP_ObjectMessageCallback( GFX_GOL_TRANSLATED_ACTION objectMessage,
 
 }
 
-void CommTask()
-{
-
-}
+/* Display refresh tick mesaage pruduce. */
 
 int TickGetMessage(GFX_GOL_MESSAGE* msg)
 {
@@ -262,7 +224,7 @@ int TickGetMessage(GFX_GOL_MESSAGE* msg)
     msg->type = TYPE_TIMER;
     msg->uiEvent = EVENT_SET;
     tick_tack = false;
-
+//    LED_YELLOW_02_LAT() = !LED_YELLOW_02_PORT();
   } else
   {
     msg->uiEvent = EVENT_INVALID;
@@ -313,8 +275,8 @@ int main(int argc, char** argv) {
           /* If is not touch message, then get tick message. */
           if (msg.uiEvent == EVENT_INVALID)
           {
-
-//            TickGetMessage(&msg);
+//            SerialGetMessage(&msg);
+            TickGetMessage(&msg);
           }
           GFX_GOL_ObjectMessage(&msg);      // Process message
         }

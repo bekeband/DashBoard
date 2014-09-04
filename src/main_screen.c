@@ -9,12 +9,14 @@
 extern unsigned int TRYING_CONN;
 
 GFX_GOL_OBJ_SCHEME  mainscheme;          // main scheme
+enum e_connect_state old_connect_state = DSP_NONE;
 
 int number = 0;
 
 /* DEBUG terminal for chacking the communication traffic. */
 GFX_GOL_STATICTEXT* pDEBUG_TERMINAL;
 GFX_XCHAR TerminalBuffer[TERMINAL_BUFFER_SIZE] = "Terminal buffer   ";
+//GFX_XCHAR CONNECT_STRINGS[][] = {{"NONE"},{"WAKE-UP"},{"INIT"},{"WAIT-FOR-CONNECT"},{"DATACHANGE"}};
 GFX_XCHAR ListBoxDatas[] = "FirstItem\nSecond Item\nThird Item";
 //GFX_XCHAR AddedItem[] = "Added Item\nMore add Item";
 
@@ -22,23 +24,12 @@ void SetMainScheme()
 {
     // initialize select screen style scheme
     memcpy( &MAIN_SCHEME, &APP_GENERIC_SCHEME, sizeof(GFX_GOL_OBJ_SCHEME));
-    /* Setting the defscheme behaviors, ang features. */
-/*    MAIN_SCHEME.Color0 =        DARKGRAY;   // panelFaceColor
-    MAIN_SCHEME.Color1 =        LIGHTGRAY;  // panelFaceColor
-    MAIN_SCHEME.TextColor0 =    GFX_RGBConvert(24, 24, 24); // first text color option
-    MAIN_SCHEME.TextColor1 =    GFX_RGBConvert(248, 252, 248);  // second text color option
-    MAIN_SCHEME.EmbossDkColor = GFX_RGBConvert(0, 32, 256);   // dark emboss color
-    MAIN_SCHEME.EmbossLtColor = GFX_RGBConvert(16, 64, 224);  // light emboss color
-    MAIN_SCHEME.TextColorDisabled = GFX_RGBConvert(128, 128, 128);
-    MAIN_SCHEME.ColorDisabled = GFX_RGBConvert(208, 224, 240);
-    MAIN_SCHEME.CommonBkColor = GFX_RGBConvert(208, 236, 240);*/
     MAIN_SCHEME.EmbossSize =    3;
     MAIN_SCHEME.CommonBkLeft = 0; // horizontal starting position of the background
     MAIN_SCHEME.CommonBkTop = 0;  // vertical starting position of the background
     MAIN_SCHEME.CommonBkType = GFX_BACKGROUND_COLOR;
     MAIN_SCHEME.pFont = (GFX_RESOURCE_HDR*)&APP_DEMO_FONT;
 
-//  memcpy(&defscheme, &GOLSchemeDefault, sizeof(GFX_GOL_OBJ_SCHEME));
 }
 
 
@@ -107,16 +98,20 @@ void MainScreenCreate(void)
 }
 
 GFX_GOL_TRANSLATED_ACTION TerminalActionGet(void* pObject, GFX_GOL_MESSAGE* pMessage)
-{ char ubuf[16];
+{ char ubuf[16]; GFX_GOL_STATICTEXT *pSt;
   if ((pMessage->type == TYPE_TIMER) && (pMessage->uiEvent == EVENT_SET))
   {
-//    LED_YELLOW_02_LAT() = !(LED_YELLOW_02_PORT());
+
+    if (GetConnectState() != old_connect_state)
+    {
+/*      pSt = (GFX_GOL_STATICTEXT *)pObject;
+      old_connect_state = GetConnectState();
+      GFX_GOL_StaticTextSet(pSt, "Nonemone");*/
+    }
     utoa(ubuf, number, 10);
-//    memcpy(((char*)&TerminalBuffer) + 16, (char*)ubuf, 2);
     number++;
     GFX_GOL_STATICTEXT *pSt;
     pSt = (GFX_GOL_STATICTEXT *)pObject;
-    pSt->hdr.state = GFX_GOL_STATICTEXT_DRAW_STATE;
     pMessage->uiEvent = EVENT_INVALID;
     return (GFX_GOL_OBJECT_ACTION_INVALID);
   } else

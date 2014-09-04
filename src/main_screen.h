@@ -4,6 +4,7 @@
 #define MAIN_SCREEN_H
 
 #include "defgraphical.h"
+#include "serial.h"
 
 extern GFX_GOL_OBJ_SCHEME  mainscheme;
 #define MAIN_SCHEME mainscheme

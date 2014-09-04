@@ -568,6 +568,8 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // touch screen font definition
 #define DRV_TOUCHSCREEN_FONT Gentium_16
 
+//#define RESISTIVETOUCH_MANUAL_SAMPLE_MODE
+
 /*********************************************************************
 * HARDWARE PROFILE for USB to program external memory
 *********************************************************************/
@@ -613,5 +615,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 #define RXPORT  PORTFbits.RF2
 
 #define K_LINE_LOOPBACK
+/* Defined DISPLAY_REFRESH in msec  */
+#define DISPLAY_REFRESH 400
 
 #endif
