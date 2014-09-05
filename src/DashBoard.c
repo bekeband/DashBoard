@@ -174,8 +174,7 @@ bool APP_ObjectMessageCallback( GFX_GOL_TRANSLATED_ACTION objectMessage,
         {
         
           /* Wake up ECU to 25 ms K line tick-tack.  */
-          MakeUpEQU();
-//          WakeUpECU();
+          WakeUpEQU();
           /* Write buffer the start communication message. */
 //          WriteInit();
         };

@@ -3,72 +3,48 @@
 #include "serial.h"
 #include <plib.h>
 
-uint8_t TXBUFFER[TX_BUFFER_SIZE];
+static uint8_t TXBUFFER[TX_BUFFER_SIZE];
 uint8_t RXBUFFER[RX_BUFFER_SIZE];
 
 int TXBUFFER_PTR;
 int RXBUFFER_PTR;
 
+/* Next response data size. */
 uint8_t data_size;
-
+/* Target ECU addr. */
 uint8_t ECU_ADDR;
-
+/* Keyword variable. */
 uint16_t KEYWORD;
 
-
-static unsigned char ERRORSTRINGS[] = {"none\0timeout\0CRC error\0invalid answer\0invalid keyword\0"};
-
-#ifndef TEST_MODE
-static const char INITBUF[5] = {FORMAT_BYTE, TARGET_ADDR, TESTER_ADDR, START_COMM_REQ, 0x66};
-#define INIT_SIZE 5
-#else
-static const char INITBUF[7] = {0x83, 0xF1, 0x11, 0xC1, 0xE9, 0x8F, 0xBE};
-#define INIT_SIZE 7
-#endif
+static GFX_XCHAR ERRORSTRINGS[] = {"none\0timeout\0CRC error\0invalid answer\0invalid keyword\0"};
+static GFX_XCHAR ERRORSTRING[] = {"none\0wake up\0init\0wait for connect\0datachange\0"};
 
 enum e_rxstate rxstate = init_start;
 enum e_OBD_error OBD_ERROR = none;
 enum e_wakeupstate WAKE_UP_STATE = WAKE_UP_STAND_BY;
 enum e_connect_state CONNECT_STATE = NONE;
 
-/* Serial output interrupt use the value to necesseary output characters.  */
-int charmustout;
-/* Output buffer pointer to byte-to-byte transmitting. */
-const uint8_t* OUT_BUF_PTR;
-/* Input buffer to interrupt received input. */
-uint8_t INBUFFER[64];
-/* How many bytes received. (And reset receiver.)*/
-uint8_t IN_BUF_PTR;
-/* Have readed chars. */
-int readed_chars;
-/* Have read packet ? Yes if have. */
-int read_packet;
-/* Still readed currend packet. */
-struct s_ask_packet current_packet;
-
-int EXPECTED_DATA_SIZE;
-
 enum e_connect_state GetConnectState() {return CONNECT_STATE;};
+enum e_OBD_error GetErrorState() {return OBD_ERROR;};
 
-struct s_ask_packet* GetPacket() {return &current_packet;};
-
-int IsReadPacket() {return read_packet;};
-
-void ClearPacket(){ read_packet=0;};
-
-void ResetInbufPTR() {IN_BUF_PTR = 0;};
-
-char* GetOBDErrorString(enum e_OBD_error error)
-{ int i, num = 0;
-
-  while (num < (int) error)
+GFX_XCHAR* GetStringANumber(const GFX_XCHAR* buffer, int hownum)
+{ int i = 0, num = 0;
+  for (i = 0; num < hownum; i++)
   {
-    if (ERRORSTRINGS[i++] == '\0') num++;
+    if (buffer[i] == '\0') num++;
   }
-//return (char*) ERRORSTRINGS[i-1];
+  return (GFX_XCHAR*)&buffer[i];
 }
 
-uint8_t* GetRXBuffer(){return (uint8_t*)&RXBUFFER;};
+GFX_XCHAR* GetConnectStateString()
+{
+  return GetStringANumber(ERRORSTRING, (int) CONNECT_STATE);
+}
+
+GFX_XCHAR* GetOBDErrorString()
+{ 
+  return GetStringANumber(ERRORSTRINGS, (int) OBD_ERROR);
+}
 
 /* Format a byte array to hex string. */
 int Format8bytesforhex(char* bstring, uint8_t* bstart)
@@ -88,8 +64,13 @@ void ClearRXBuffer()
 
 void InitUART1()
 {
+#ifdef TEST_MODE
   UARTConfigure(UART_MODULE_ID, UART_ENABLE_PINS_TX_RX_ONLY | UART_INVERT_TRANSMIT_POLARITY | 
       UART_INVERT_RECEIVE_POLARITY | UART_ENABLE_LOOPBACK);
+#else
+  UARTConfigure(UART_MODULE_ID, UART_ENABLE_PINS_TX_RX_ONLY | UART_INVERT_TRANSMIT_POLARITY |
+      UART_INVERT_RECEIVE_POLARITY);
+#endif
   UARTSetFifoMode(UART_MODULE_ID, UART_INTERRUPT_ON_TX_NOT_FULL | UART_INTERRUPT_ON_RX_NOT_EMPTY);
   UARTSetLineControl(UART_MODULE_ID, UART_DATA_SIZE_8_BITS | UART_PARITY_NONE | UART_STOP_BITS_1);
   UARTSetDataRate(UART_MODULE_ID, GetPeripheralClock(), DESIRED_BAUDRATE);
@@ -150,18 +131,13 @@ for (i = 0; i < size; i++)
 
 }
 
-void ClearUART1Errors()
-{
-  
-}
-
-bool CRCTest(int size, uint8_t* buffer, uint8_t TestCRC)
+uint8_t CRCMake(int size, uint8_t* buffer)
 { int i; uint8_t sum = 0;
   for (i = 0; i < size; i++)
   {
     sum += buffer[i];
   }
-  return (TestCRC == sum);
+return sum;
 }
 
 int CheckConnection(uint8_t* buffer)
@@ -169,7 +145,7 @@ int CheckConnection(uint8_t* buffer)
   if ((buffer[0] > 0x80) && (buffer[0] < 0x88))
   {
     data_size = buffer[0] - 0x80;
-    if ((buffer[1] == TESTER_ADDR) && (buffer[3] == FORMAT_BYTE))
+    if ((buffer[1] == TESTER_ADDR) && (buffer[3] == INIT_FORMAT_BYTE))
     {
       ECU_ADDR = RXBUFFER[2];
       KEYWORD = RXBUFFER[4] + (RXBUFFER[5] * 256);
@@ -198,7 +174,7 @@ void __ISR(_UART_1_VECTOR, ipl2) IntUart1Handler(void)
         RXBUFFER[RXBUFFER_PTR++] = U1RXREG;
       } else
       {
-        if (CRCTest((INIT_RESPOND_SIZE - 1), RXBUFFER, U1RXREG))
+        if (CRCMake((INIT_RESPOND_SIZE - 1), RXBUFFER) == U1RXREG)
         {/* CRC OK*/
           if (CheckConnection(RXBUFFER) > -1)
           {
@@ -241,29 +217,33 @@ void EnableUART1()
 
 bool WriteInit()
 {
-  WriteBuffer(INITBUF, INIT_SIZE);
+#ifndef TEST_MODE
+  TXBUFFER[0] = INIT_FORMAT_BYTE;
+  TXBUFFER[1] = TARGET_ADDR;
+  TXBUFFER[2] = TESTER_ADDR;
+  TXBUFFER[3] = START_COMM_REQ;
+  TXBUFFER[4] = CRCMake(3, TXBUFFER);
+
+#define INIT_SIZE 5
+#else
+  TXBUFFER[0] = 0x83;
+  TXBUFFER[1] = TESTER_ADDR;
+  TXBUFFER[2] = 0x11;
+  TXBUFFER[3] = INIT_FORMAT_BYTE;
+  TXBUFFER[4] = 0xE9;
+  TXBUFFER[5] = 0x8F;
+  TXBUFFER[6] = CRCMake(6, TXBUFFER);
+
+#define INIT_SIZE 7
+#endif
+
+  WriteBuffer(TXBUFFER, INIT_SIZE);
   return true;
 }
+
 /* Wake UP ECU for slow, or fast init procedure. */
 
-void WakeUpECU()
-{ /* Now fast init wake up. Not  5 baud initialize. */
-  DisableUART1();
-  TXTRIS = 0; /* TX port set output, */
-  TXLAT = 0;
-  /* Starting time for. */
-  __delay_ms(300);
-  __delay_ms(300);
-  __delay_ms(300);
-  TXLAT = 1;
-  __delay_ms(25);
-  TXLAT = 0;
-  __delay_ms(25);
-  /* Then anable UART TX RX to send to initialize data. */
-  EnableUART1();
-}
-
-void MakeUpEQU()
+void WakeUpEQU()
 {
   CONNECT_STATE = WAKE_UP;
 }

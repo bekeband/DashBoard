@@ -9,16 +9,13 @@
 extern unsigned int TRYING_CONN;
 
 GFX_GOL_OBJ_SCHEME  mainscheme;          // main scheme
-enum e_connect_state old_connect_state = DSP_NONE;
+enum e_connect_state old_connect_state = NONE;
+enum e_OBD_error OLD_OBD_ERROR = none;
 
 int number = 0;
 
 /* DEBUG terminal for chacking the communication traffic. */
-GFX_GOL_STATICTEXT* pDEBUG_TERMINAL;
-GFX_XCHAR TerminalBuffer[TERMINAL_BUFFER_SIZE] = "Terminal buffer   ";
-//GFX_XCHAR CONNECT_STRINGS[][] = {{"NONE"},{"WAKE-UP"},{"INIT"},{"WAIT-FOR-CONNECT"},{"DATACHANGE"}};
-GFX_XCHAR ListBoxDatas[] = "FirstItem\nSecond Item\nThird Item";
-//GFX_XCHAR AddedItem[] = "Added Item\nMore add Item";
+//GFX_GOL_STATICTEXT* pDEBUG_TERMINAL;
 
 void SetMainScheme()
 {
@@ -51,69 +48,76 @@ uint16_t CreateStartButton(void)
  * 
  **************************************************/
 void MainScreenCreate(void)
-{
+{ int height;
+  GFX_GOL_STATICTEXT* pSt;
 
-    if (!TRYING_CONN)
-    {
-      if (!CreateStartButton()) ErrorCreate(0); 
-    }
+  height = GFX_TextStringHeightGet(MAIN_SCHEME.pFont);
 
-    pDEBUG_TERMINAL = (GFX_GOL_StaticTextCreate (
-        MAIN_TERMINAL,                  // ID
-        0, 100, 319, 160,               // dimension
+  if (!TRYING_CONN)
+  {
+    if (!CreateStartButton()) ErrorCreate(0);
+  }
+
+  pSt = GFX_GOL_StaticTextCreate (
+        CONNECT_TERMINAL,                  // ID
+        0, 4, 150, (height + 4 + 2),               // dimension
         GFX_GOL_STATICTEXT_DRAW_STATE,  // draw the object
-        (GFX_XCHAR*)TerminalBuffer,     // 2 lines of text
+        "",
         GFX_ALIGN_LEFT | GFX_ALIGN_TOP, // align text on the center
-        &MAIN_SCHEME));
-    if (pDEBUG_TERMINAL == NULL)
+        &MAIN_SCHEME);
+  if (pSt == NULL)
     {
       ErrorCreate(0);
-    }else                  // use given scheme
+    } else
     {
-      pDEBUG_TERMINAL->hdr.actionGet = TerminalActionGet;
+      pSt->hdr.actionGet = ConnectTerminalActionGet;
     }
 
-/*    GFX_GOL_CheckBoxCreate(ID_CONTYPE_BOX, 0, 180, 319, 220, GFX_GOL_CHECKBOX_DRAW_STATE,
-        "Scale", GFX_ALIGN_CENTER, &MAIN_SCHEME);*/
-
-    if (GFX_GOL_ListBoxCreate (
-        MAIN_LISTBOX,                   // ID
-        10, 10, 300, 96,                // dimension
-        GFX_GOL_LISTBOX_DRAW_STATE,     // draw the object
-        (GFX_XCHAR*)ListBoxDatas,
+  pSt = GFX_GOL_StaticTextCreate (
+        ERROR_TERMINAL,                  // ID
+        160, 4, 319, (height + 4 + 2),               // dimension
+        GFX_GOL_STATICTEXT_DRAW_STATE,  // draw the object
+        "",
         GFX_ALIGN_LEFT | GFX_ALIGN_TOP, // align text on the center
-        &MAIN_SCHEME) == NULL)
+        &MAIN_SCHEME);
+  if (pSt == NULL)
     {
       ErrorCreate(0);
+    } else
+    {
+      pSt->hdr.actionGet = ErrorTerminalActionGet;
     }
-
-// create the list of items to be placed in the listbox
-// Add items (each line will become one item,
-// lines must be separated by 'n' character)
-
-//  GFX_GOL_ListBoxItemAdd(pMAIN_LISTBOX, NULL, (GFX_XCHAR*)AddedItem, NULL, 0, 1);
-  /* Create MAIN button on bottom of screen. */
-
 
 }
 
-GFX_GOL_TRANSLATED_ACTION TerminalActionGet(void* pObject, GFX_GOL_MESSAGE* pMessage)
-{ char ubuf[16]; GFX_GOL_STATICTEXT *pSt;
+GFX_GOL_TRANSLATED_ACTION ConnectTerminalActionGet(void* pObject, GFX_GOL_MESSAGE* pMessage)
+{ GFX_GOL_STATICTEXT *pSt; GFX_XCHAR* str;
   if ((pMessage->type == TYPE_TIMER) && (pMessage->uiEvent == EVENT_SET))
   {
-
     if (GetConnectState() != old_connect_state)
     {
-/*      pSt = (GFX_GOL_STATICTEXT *)pObject;
+      pSt = (GFX_GOL_STATICTEXT *)pObject;
       old_connect_state = GetConnectState();
-      GFX_GOL_StaticTextSet(pSt, "Nonemone");*/
+      str = GetConnectStateString();
+      GFX_GOL_StaticTextSet(pSt, str);
+      GFX_GOL_ObjectStateSet(pSt, GFX_GOL_STATICTEXT_DRAW_STATE);
     }
-    utoa(ubuf, number, 10);
-    number++;
-    GFX_GOL_STATICTEXT *pSt;
-    pSt = (GFX_GOL_STATICTEXT *)pObject;
-    pMessage->uiEvent = EVENT_INVALID;
-    return (GFX_GOL_OBJECT_ACTION_INVALID);
+  } else
+    return GFX_GOL_StaticTextActionGet(pObject, pMessage);
+}
+
+GFX_GOL_TRANSLATED_ACTION ErrorTerminalActionGet(void* pObject, GFX_GOL_MESSAGE* pMessage)
+{ GFX_GOL_STATICTEXT *pSt; GFX_XCHAR* str;
+  if ((pMessage->type == TYPE_TIMER) && (pMessage->uiEvent == EVENT_SET))
+  {
+    if (GetErrorState() != OLD_OBD_ERROR)
+    {
+      pSt = (GFX_GOL_STATICTEXT *)pObject;
+      OLD_OBD_ERROR = GetErrorState();
+      str = GetOBDErrorString();
+      GFX_GOL_StaticTextSet(pSt, str);
+      GFX_GOL_ObjectStateSet(pSt, GFX_GOL_STATICTEXT_DRAW_STATE);
+    }
   } else
     return GFX_GOL_StaticTextActionGet(pObject, pMessage);
 }

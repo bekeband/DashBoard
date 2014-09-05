@@ -16,20 +16,6 @@
 
 #define waitforTXempty {while (U1STAbits.UTXBF);}
 
-void InitUART1();
-void WriteString(const char *string);
-void WriteBuffer(const char *buffer, int size);
-void DisableUART1();
-void EnableUART1();
-uint8_t* GetRXBuffer();
-int GetRXBufferInHex(char* string, int max_size);
-void ClearRXBuffer();
-
-void WakeUpECU();
-void MakeUpEQU();
-
-bool WriteInit();
-
 enum e_wakeupstate {
   WAKE_UP_STAND_BY,
   WAKE_UP_INIT,
@@ -52,9 +38,6 @@ enum e_connect_state {
   DATACHANGE  = 4,
   DSP_NONE = -1
 };
-
-enum e_connect_state GetConnectState();
-char* GetConnectStateString();
 
 enum e_OBD_error {
   none = 0,
@@ -90,30 +73,34 @@ struct s_ask_packet{
 
 #define INIT_TIMEOUT  (INIT_RESPOND_SIZE * 2)
 
-#define FORMAT_BYTE     0xC1
+#define INIT_FORMAT_BYTE      0xC1
+#define PID_FORMAT_BYTE       0xC2
 #define TARGET_ADDR     0x33
 #define TESTER_ADDR     0xF1
 #define START_COMM_REQ  0x81
 #define KEY_ISO14230_4  0x8FE9
 
-/* predefined procedures here. */
-int IsReadPacket();
-void SetSerialOut(const uint8_t newbuffer[],int size);
-void ClearPacket();
-struct s_ask_packet* GetPacket();
-int GetTick();
-
-int ASCII_Serial_Input(uint8_t inchar);
-int BINARY_Serial_Input(uint8_t inchar);
-int Serial_Input(uint8_t inchar);
-
-void ResetInbufPTR();
-void Serial_Output();
-void StartT4Timer();
-
-void DisableUART1TX();
-void EnableUART1RX();
-void EnableUART1TX();
+void InitUART1();
+void WriteString(const char *string);
+void WriteBuffer(const char *buffer, int size);
 void DisableUART1();
+void EnableUART1();
+uint8_t* GetRXBuffer();
+int GetRXBufferInHex(char* string, int max_size);
+void ClearRXBuffer();
+uint8_t CRCMake(int size, uint8_t* buffer);
+
+void WakeUpEQU();
+
+bool WriteInit();
+
+enum e_connect_state GetConnectState();
+enum e_OBD_error GetErrorState();
+
+GFX_XCHAR* GetConnectStateString();
+GFX_XCHAR* GetOBDErrorString();
+
+
+
 
 #endif
