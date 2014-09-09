@@ -88,6 +88,23 @@ void MainScreenCreate(void)
       pSt->hdr.actionGet = ErrorTerminalActionGet;
     }
 
+#ifdef DEBUG_TERMINAL
+  pSt = GFX_GOL_StaticTextCreate (
+        DEBUG_TERMINAL,                  // ID
+        0, (height + 10), 319, (height*2 + 10),
+        GFX_GOL_STATICTEXT_DRAW_STATE,  // draw the object
+        "",
+        GFX_ALIGN_LEFT | GFX_ALIGN_TOP, // align text on the center
+        &MAIN_SCHEME);
+  if (pSt == NULL)
+    {
+      ErrorCreate(0);
+    } else
+    {
+      pSt->hdr.actionGet = DebugTerminalActionGet;
+    }
+#endif
+
 }
 
 GFX_GOL_TRANSLATED_ACTION ConnectTerminalActionGet(void* pObject, GFX_GOL_MESSAGE* pMessage)
@@ -121,3 +138,22 @@ GFX_GOL_TRANSLATED_ACTION ErrorTerminalActionGet(void* pObject, GFX_GOL_MESSAGE*
   } else
     return GFX_GOL_StaticTextActionGet(pObject, pMessage);
 }
+
+#ifdef DEBUG_TERMINAL
+
+GFX_XCHAR DEBUG_BUFFER[64];
+
+GFX_GOL_TRANSLATED_ACTION DebugTerminalActionGet(void* pObject, GFX_GOL_MESSAGE* pMessage)
+{ GFX_GOL_STATICTEXT *pSt;
+  if ((pMessage->type == TYPE_TIMER) && (pMessage->uiEvent == EVENT_SET))
+  {
+      pSt = (GFX_GOL_STATICTEXT *)pObject;
+      OLD_OBD_ERROR = GetErrorState();
+      GetRXBufferInHex(DEBUG_BUFFER, 64);
+      GFX_GOL_StaticTextSet(pSt, DEBUG_BUFFER);
+      GFX_GOL_ObjectStateSet(pSt, GFX_GOL_STATICTEXT_DRAW_STATE);
+  } else
+    return GFX_GOL_StaticTextActionGet(pObject, pMessage);
+}
+
+#endif

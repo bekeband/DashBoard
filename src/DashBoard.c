@@ -145,6 +145,9 @@ bool APP_ObjectDrawCallback(void)
    return true;
 };
 
+static uint8_t INITBUF[5] = {INIT_FORMAT_BYTE, TARGET_ADDR, TESTER_ADDR, START_COMM_REQ, 0x66};
+
+
 bool APP_ObjectMessageCallback( GFX_GOL_TRANSLATED_ACTION objectMessage,
   GFX_GOL_OBJ_HEADER* pObject, GFX_GOL_MESSAGE* pMessage)
 {
@@ -170,28 +173,17 @@ bool APP_ObjectMessageCallback( GFX_GOL_TRANSLATED_ACTION objectMessage,
         };
       } else if ((objectMessage == GFX_GOL_BUTTON_ACTION_RELEASED) && (objID == ID_START_CONNECTION))
       {
-//        if (GFX_GOL_ObjectStateGet(pObject, GFX_GOL_BUTTON_PRESSED_STATE))
-        {
-        
-          /* Wake up ECU to 25 ms K line tick-tack.  */
-          WakeUpEQU();
-          /* Write buffer the start communication message. */
-//          WriteInit();
-        };
-/*        __delay_ms(300);
+        LEDPortsClear();
+        WakeUpECU();
+
+        WriteBuffer(INITBUF, 5);
+
+        __delay_ms(300);
+        __delay_ms(300);
+        __delay_ms(300);
         __delay_ms(300);
 
-      uint8_t* RXBufferPtr;
-
-      if (pDEBUG_TERMINAL)
-      {
-        RXBufferPtr = GetRXBuffer();
-        Format8bytesforhex((char*)&TerminalBuffer, RXBufferPtr);
-      }
-
-      pMessage->type = TYPE_TIMER;
-      pMessage->uiEvent = EVENT_SET;
-      ClearRXBuffer();*/
+        
 
       } break;
     case DISPLAY_SWRESET:

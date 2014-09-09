@@ -5,6 +5,7 @@
 
 #include <plib.h>            /* Include to use PIC32 peripheral libraries     */
 #include "system.h"
+#include "defgraphical.h"
 
 #define UART_MODULE_ID UART1 // PIM is connected to Explorer through UART1 module
 
@@ -36,18 +37,20 @@ enum e_connect_state {
   INIT    = 2,
   WAIT_FOR_CONNECT = 3,
   DATACHANGE  = 4,
+  WAIT_FOR_HEARTBEAT = 5,
   DSP_NONE = -1
 };
 
 enum e_OBD_error {
   none = 0,
-  timeout,
-  CRC,
-  invalid_answer,
-  invalid_keyword,
-  rxbuffer_full,
-  wait_for_con_timeout,
-  connection_error
+  timeout = 1,
+  CRC = 2,
+  invalid_answer = 3,
+  invalid_keyword = 4,
+  rxbuffer_full = 5,
+  wait_for_con_timeout = 6,
+  heartbeat_overtime = 7,
+  connection_error = 8
 };
 
 struct s_ask_packet{
@@ -66,7 +69,13 @@ struct s_ask_packet{
 
 #define INIT_RESPOND_SIZE 7
 /* Wait for connect. This is the overtime to wait is msec. */
-#define CONNECT_OVERTIME  400
+#define CONNECT_OVERTIME  4000
+/* HEARTBEAT_OVERTIME */
+#define HEARTBEAT_OVERTIME  400
+
+#define PRE_DELAY_TIME  1000
+#define WKUP_INPULSE_TIME_01  25
+#define WKUP_INPULSE_TIME_02  25
 
 /* INIT_TIMEOUT: max timeout time the init packet answer.
  (7 bytes * 2 msec.*/
@@ -79,20 +88,26 @@ struct s_ask_packet{
 #define TESTER_ADDR     0xF1
 #define START_COMM_REQ  0x81
 #define KEY_ISO14230_4  0x8FE9
+#define SERVICE_01      0x01
+#define PID_00          0x00
 
 void InitUART1();
 void WriteString(const char *string);
-void WriteBuffer(const char *buffer, int size);
+int WriteBuffer(const char *buffer, int size);
 void DisableUART1();
 void EnableUART1();
-uint8_t* GetRXBuffer();
+
+#ifdef DEBUG_TERMINAL
 int GetRXBufferInHex(char* string, int max_size);
+#endif
+
 void ClearRXBuffer();
 uint8_t CRCMake(int size, uint8_t* buffer);
 
-void WakeUpEQU();
+void WakeUpECU();
 
-bool WriteInit();
+void WriteInit();
+void WriteGetPIDs();
 
 enum e_connect_state GetConnectState();
 enum e_OBD_error GetErrorState();

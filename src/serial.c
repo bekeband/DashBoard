@@ -5,6 +5,7 @@
 
 static uint8_t TXBUFFER[TX_BUFFER_SIZE];
 uint8_t RXBUFFER[RX_BUFFER_SIZE];
+int SEND_DATA_SIZE;
 
 int TXBUFFER_PTR;
 int RXBUFFER_PTR;
@@ -16,8 +17,10 @@ uint8_t ECU_ADDR;
 /* Keyword variable. */
 uint16_t KEYWORD;
 
-static GFX_XCHAR ERRORSTRINGS[] = {"none\0timeout\0CRC error\0invalid answer\0invalid keyword\0"};
-static GFX_XCHAR ERRORSTRING[] = {"none\0wake up\0init\0wait for connect\0datachange\0"};
+static GFX_XCHAR ERRORSTRINGS[] = {"none\0timeout\0CRC error\0invalid answer\0invalid keyword\0rxbuffer full\0wait for conn timeout\0"\
+"heartbeat overtime\0connection error\0"};
+
+static GFX_XCHAR CONNECT_STATE_STRINGS[] = {"none\0wake up\0init\0wait for connect\0datachange\0wait for heartbeat\0"};
 
 enum e_rxstate rxstate = init_start;
 enum e_OBD_error OBD_ERROR = none;
@@ -26,6 +29,23 @@ enum e_connect_state CONNECT_STATE = NONE;
 
 enum e_connect_state GetConnectState() {return CONNECT_STATE;};
 enum e_OBD_error GetErrorState() {return OBD_ERROR;};
+
+void WakeUpECU()
+{ /* Now fast init wake up. Not  5 baud initialize. */
+  DisableUART1();
+  TXTRIS = 0; /* TX port set output, */
+  TXLAT = 0;
+  /* Starting time for. */
+  __delay_ms(300);
+  __delay_ms(300);
+  __delay_ms(300);
+  TXLAT = 1;
+  __delay_ms(25);
+  TXLAT = 0;
+  __delay_ms(25);
+  /* Then anable UART TX RX to send to initialize data. */
+  EnableUART1();
+}
 
 GFX_XCHAR* GetStringANumber(const GFX_XCHAR* buffer, int hownum)
 { int i = 0, num = 0;
@@ -38,7 +58,7 @@ GFX_XCHAR* GetStringANumber(const GFX_XCHAR* buffer, int hownum)
 
 GFX_XCHAR* GetConnectStateString()
 {
-  return GetStringANumber(ERRORSTRING, (int) CONNECT_STATE);
+  return GetStringANumber(CONNECT_STATE_STRINGS, (int) CONNECT_STATE);
 }
 
 GFX_XCHAR* GetOBDErrorString()
@@ -46,16 +66,9 @@ GFX_XCHAR* GetOBDErrorString()
   return GetStringANumber(ERRORSTRINGS, (int) OBD_ERROR);
 }
 
-/* Format a byte array to hex string. */
-int Format8bytesforhex(char* bstring, uint8_t* bstart)
-{
-  sprintf(bstring, "%2X %2X %2X %2X %2X %2X %2X %2X", bstart[0],bstart[1], bstart[2], bstart[3], bstart[4], bstart[5], bstart[6], bstart[7]);
-}
-
 void ClearRXBuffer()
 { int i;
   RXBUFFER_PTR = 0;
-  TXBUFFER_PTR = 0;
   for (i = 0; i < RX_BUFFER_SIZE; i++)
   {
     RXBUFFER[i] = 0;
@@ -66,7 +79,8 @@ void InitUART1()
 {
 #ifdef TEST_MODE
   UARTConfigure(UART_MODULE_ID, UART_ENABLE_PINS_TX_RX_ONLY | UART_INVERT_TRANSMIT_POLARITY | 
-      UART_INVERT_RECEIVE_POLARITY | UART_ENABLE_LOOPBACK);
+      UART_INVERT_RECEIVE_POLARITY);
+  //| UART_ENABLE_LOOPBACK);
 #else
   UARTConfigure(UART_MODULE_ID, UART_ENABLE_PINS_TX_RX_ONLY | UART_INVERT_TRANSMIT_POLARITY |
       UART_INVERT_RECEIVE_POLARITY);
@@ -114,21 +128,31 @@ void WriteString(const char *string)
 //  PORTDbits.RD0 = 1;
 }
 
-void WriteBuffer(const char *buffer, int size)
+int WriteBuffer(const char *buffer, int size)
 { int i;
 
+#ifndef TEST_MODE
+     /*  */
+//     UARTEnable(UART_MODULE_ID, UART_DISABLE_FLAGS(UART_RX));
+#endif
+
+
 for (i = 0; i < size; i++)
-    {
-        while(!UARTTransmitterIsReady(UART_MODULE_ID))
-            ;
+  {
+    while(!UARTTransmitterIsReady(UART_MODULE_ID));
 
-        UARTSendDataByte(UART_MODULE_ID, *buffer);
+    UARTSendDataByte(UART_MODULE_ID, *buffer);
 
-        buffer++;
+    buffer++;
 
-//        while(!UARTTransmissionHasCompleted(UART_MODULE_ID)) ;
-    }
+//    while(!UARTTransmissionHasCompleted(UART_MODULE_ID)) ;
+  }
 
+#ifndef TEST_MODE
+//     UARTEnable(UART_MODULE_ID, UART_ENABLE_FLAGS(UART_RX));
+#endif
+
+return i;
 }
 
 uint8_t CRCMake(int size, uint8_t* buffer)
@@ -160,13 +184,27 @@ int CheckConnection(uint8_t* buffer)
   } else return -1;
 }
 
+#define BUFFER_TEST_MODE
+
 /* Serial interrupt program for RX characters. */
 
 void __ISR(_UART_1_VECTOR, ipl2) IntUart1Handler(void)
 {
+
 	// Is this an RX interrupt?
 	if(INTGetFlag(INT_SOURCE_UART_RX(UART_MODULE_ID)))
 	{
+#ifdef BUFFER_TEST_MODE
+
+    if (RXBUFFER_PTR < RX_BUFFER_SIZE)
+    {
+      RXBUFFER[RXBUFFER_PTR++] = U1RXREG;
+    } else
+    {
+      RXBUFFER_PTR = 0;
+    }
+#else
+
     if (RXBUFFER_PTR < RX_BUFFER_SIZE)
     {
       if (RXBUFFER_PTR < (INIT_RESPOND_SIZE - 1))
@@ -199,6 +237,7 @@ void __ISR(_UART_1_VECTOR, ipl2) IntUart1Handler(void)
       OBD_ERROR = rxbuffer_full;
       RXBUFFER_PTR = 0;
     }
+#endif
     // Clear the RX interrupt Flag
 	  INTClearFlag(INT_SOURCE_UART_RX(UART_MODULE_ID));
 
@@ -215,16 +254,28 @@ void EnableUART1()
   UARTEnable(UART_MODULE_ID, UART_ENABLE_FLAGS(UART_PERIPHERAL | UART_RX | UART_TX));
 }
 
-bool WriteInit()
+void WriteGetPIDs()
 {
+  TXBUFFER[0] = PID_FORMAT_BYTE;
+  TXBUFFER[1] = TARGET_ADDR;
+  TXBUFFER[2] = TESTER_ADDR;
+  TXBUFFER[3] = SERVICE_01;
+  TXBUFFER[4] = PID_00;
+  TXBUFFER[5] = CRCMake(5, TXBUFFER);
+  SEND_DATA_SIZE = 6;
+  ClearRXBuffer();
+  WriteBuffer(TXBUFFER, SEND_DATA_SIZE);
+}
+
+void WriteInit()
+{ int isize;
 #ifndef TEST_MODE
   TXBUFFER[0] = INIT_FORMAT_BYTE;
   TXBUFFER[1] = TARGET_ADDR;
   TXBUFFER[2] = TESTER_ADDR;
   TXBUFFER[3] = START_COMM_REQ;
-  TXBUFFER[4] = CRCMake(3, TXBUFFER);
-
-#define INIT_SIZE 5
+  TXBUFFER[4] = CRCMake(4, TXBUFFER);
+  SEND_DATA_SIZE = 5;
 #else
   TXBUFFER[0] = 0x83;
   TXBUFFER[1] = TESTER_ADDR;
@@ -233,20 +284,19 @@ bool WriteInit()
   TXBUFFER[4] = 0xE9;
   TXBUFFER[5] = 0x8F;
   TXBUFFER[6] = CRCMake(6, TXBUFFER);
+  SEND_DATA_SIZE = 7;
 
-#define INIT_SIZE 7
 #endif
-
-  WriteBuffer(TXBUFFER, INIT_SIZE);
-  return true;
+  ClearRXBuffer();
+  isize = WriteBuffer(TXBUFFER, SEND_DATA_SIZE);
 }
 
 /* Wake UP ECU for slow, or fast init procedure. */
 
-void WakeUpEQU()
+/*void WakeUpECU()
 {
   CONNECT_STATE = WAKE_UP;
-}
+}*/
 
 /* We'll use the T4 timer for overtime measuring the incoming packets. */
 
@@ -279,7 +329,7 @@ void __ISR(_TIMER_4_VECTOR, ipl2) Timer4Handler(void)
         } break;
         case  PRE_DELAY:
         {
-          if (T4_TICK_TACK++ == 1000)
+          if (T4_TICK_TACK++ == PRE_DELAY_TIME)
           {
             T4_TICK_TACK = 0;
             TXLAT = 1;
@@ -288,7 +338,7 @@ void __ISR(_TIMER_4_VECTOR, ipl2) Timer4Handler(void)
         } break;
         case  WK_ON_DELAY:
         {
-          if (T4_TICK_TACK++ == 25)
+          if (T4_TICK_TACK++ == WKUP_INPULSE_TIME_01)
           {
             T4_TICK_TACK = 0;
             TXLAT = 0;
@@ -297,7 +347,7 @@ void __ISR(_TIMER_4_VECTOR, ipl2) Timer4Handler(void)
         } break;
         case  WK_OFF_DELAY:
         {
-          if (T4_TICK_TACK++ == 25)
+          if (T4_TICK_TACK++ == WKUP_INPULSE_TIME_02)
           {
             EnableUART1();
             WAKE_UP_STATE = WAKE_UP_END;
@@ -313,15 +363,7 @@ void __ISR(_TIMER_4_VECTOR, ipl2) Timer4Handler(void)
     } break;
     case INIT:
     {
-#ifndef TEST_MODE
-     /*  */
-     UARTEnable(UART_MODULE_ID, UART_ENABLE_FLAGS(UART_PERIPHERAL | UART_TX));
-#endif
       WriteInit();
-#ifndef TEST_MODE
-     UARTEnable(UART_MODULE_ID, UART_ENABLE_FLAGS(UART_PERIPHERAL | UART_RX));
-#endif
-      LED_YELLOW_01_LAT() = 1;
       CONNECT_STATE = WAIT_FOR_CONNECT;
     } break;
     case WAIT_FOR_CONNECT:
@@ -335,9 +377,28 @@ void __ISR(_TIMER_4_VECTOR, ipl2) Timer4Handler(void)
     /* This state give in the timer4 UART1RX interrupt, when read the connection string. */
     case DATACHANGE:
     {
-      
+#ifndef TEST_MODE
+     /*  */
+     UARTEnable(UART_MODULE_ID, UART_ENABLE_FLAGS(UART_PERIPHERAL | UART_TX));
+#endif
+      T4_TICK_TACK = 0;
+      WriteGetPIDs();
+#ifndef TEST_MODE
+     UARTEnable(UART_MODULE_ID, UART_ENABLE_FLAGS(UART_PERIPHERAL | UART_RX));
+#endif
       LED_RED_01_LAT() = 1;
-    }
+      CONNECT_STATE = WAIT_FOR_HEARTBEAT;
+    } break;
+
+    case WAIT_FOR_HEARTBEAT:
+    {
+      if (T4_TICK_TACK++ > HEARTBEAT_OVERTIME)
+      {
+        CONNECT_STATE = NONE;
+        OBD_ERROR = heartbeat_overtime;
+      } break;
+
+    } break;
 
     }
   }
@@ -345,3 +406,12 @@ void __ISR(_TIMER_4_VECTOR, ipl2) Timer4Handler(void)
   IFS0bits.T4IF = 0;
 }
 
+#ifdef DEBUG_TERMINAL
+int GetRXBufferInHex(char* string, int max_size)
+  {
+  sprintf(string, "%2x %2x %2x %2x %2x %2x %2x %2x %2x %2x %2x %2x %2x %2x %2x %2x",
+      RXBUFFER[0], RXBUFFER[1], RXBUFFER[2] ,RXBUFFER[3], RXBUFFER[4], RXBUFFER[5], RXBUFFER[6], RXBUFFER[7],
+      RXBUFFER[8], RXBUFFER[9], RXBUFFER[10] ,RXBUFFER[11], RXBUFFER[12], RXBUFFER[13], RXBUFFER[14], RXBUFFER[15]
+      );
+  }
+#endif

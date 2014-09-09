@@ -17,6 +17,7 @@ extern const GFX_GOL_OBJ_SCHEME GOLSchemeDefault;
 #define MAIN_WINDOW     60
 #define CONNECT_TERMINAL   61
 #define ERROR_TERMINAL    62
+#define DEBUG_TERMINAL    70
 
 /* Options screen object ID's 100 - 150  */
 

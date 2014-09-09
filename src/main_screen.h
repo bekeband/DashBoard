@@ -15,6 +15,7 @@ extern GFX_GOL_OBJ_SCHEME  mainscheme;
 void SetMainScheme();
 GFX_GOL_TRANSLATED_ACTION ConnectTerminalActionGet(void* pObject, GFX_GOL_MESSAGE* pMessage);
 GFX_GOL_TRANSLATED_ACTION ErrorTerminalActionGet(void* pObject, GFX_GOL_MESSAGE* pMessage);
+GFX_GOL_TRANSLATED_ACTION DebugTerminalActionGet(void* pObject, GFX_GOL_MESSAGE* pMessage);
 GFX_GOL_STATICTEXT* pDEBUG_TERMINAL;
 
 #endif
