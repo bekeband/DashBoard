@@ -22,7 +22,7 @@ static GFX_XCHAR ERRORSTRINGS[] = {"none\0timeout\0CRC error\0invalid answer\0in
 
 static GFX_XCHAR CONNECT_STATE_STRINGS[] = {"none\0wake up\0init\0wait for connect\0datachange\0wait for heartbeat\0"};
 
-enum e_rxstate rxstate = init_start;
+enum e_rxstate RX_STATE_MODE;
 enum e_OBD_error OBD_ERROR = none;
 enum e_wakeupstate WAKE_UP_STATE = WAKE_UP_STAND_BY;
 enum e_connect_state CONNECT_STATE = NONE;
@@ -31,11 +31,10 @@ enum e_connect_state GetConnectState() {return CONNECT_STATE;};
 enum e_OBD_error GetErrorState() {return OBD_ERROR;};
 
 void WakeUpECU()
-{ /* Now fast init wake up. Not  5 baud initialize. */
+{ 
   DisableUART1();
-  TXTRIS = 0; /* TX port set output, */
+  TXTRIS = 0; 
   TXLAT = 0;
-  /* Starting time for. */
   __delay_ms(300);
   __delay_ms(300);
   __delay_ms(300);
@@ -43,8 +42,8 @@ void WakeUpECU()
   __delay_ms(25);
   TXLAT = 0;
   __delay_ms(25);
-  /* Then anable UART TX RX to send to initialize data. */
   EnableUART1();
+  CONNECT_STATE = INIT;
 }
 
 GFX_XCHAR* GetStringANumber(const GFX_XCHAR* buffer, int hownum)
@@ -194,15 +193,30 @@ void __ISR(_UART_1_VECTOR, ipl2) IntUart1Handler(void)
 	// Is this an RX interrupt?
 	if(INTGetFlag(INT_SOURCE_UART_RX(UART_MODULE_ID)))
 	{
+    if (RXBUFFER_PTR < RX_BUFFER_SIZE)
+    {
+      RXBUFFER[RXBUFFER_PTR++] = U1RXREG;
+      switch (RX_STATE_MODE)
+      { /* INIT_LOOPBACK */
+        case INIT_LOOPBACK:
+        { /* LOOPBACK THE ALL INIT BYTES??? */
+          if (RXBUFFER_PTR == SEND_DATA_SIZE)
+          {
+
+          }
+        }break;
+      }
+    };
+
 #ifdef BUFFER_TEST_MODE
 
-    if (RXBUFFER_PTR < RX_BUFFER_SIZE)
+/*    if (RXBUFFER_PTR < RX_BUFFER_SIZE)
     {
       RXBUFFER[RXBUFFER_PTR++] = U1RXREG;
     } else
     {
       RXBUFFER_PTR = 0;
-    }
+    }*/
 #else
 
     if (RXBUFFER_PTR < RX_BUFFER_SIZE)
@@ -355,7 +369,6 @@ void __ISR(_TIMER_4_VECTOR, ipl2) Timer4Handler(void)
         } break;
         case  WAKE_UP_END:
         {
-
           T4_TICK_TACK = 0;
           WAKE_UP_STATE = WAKE_UP_STAND_BY;
           CONNECT_STATE = INIT;
@@ -366,6 +379,7 @@ void __ISR(_TIMER_4_VECTOR, ipl2) Timer4Handler(void)
       WriteInit();
       CONNECT_STATE = WAIT_FOR_CONNECT;
     } break;
+
     case WAIT_FOR_CONNECT:
     {
       if (T4_TICK_TACK++ > CONNECT_OVERTIME)
@@ -374,6 +388,12 @@ void __ISR(_TIMER_4_VECTOR, ipl2) Timer4Handler(void)
         OBD_ERROR = wait_for_con_timeout;
       }
     }break;
+
+    case LOOPBACK_OK:
+    {
+
+    }break;
+
     /* This state give in the timer4 UART1RX interrupt, when read the connection string. */
     case DATACHANGE:
     {

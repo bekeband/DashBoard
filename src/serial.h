@@ -26,7 +26,8 @@ enum e_wakeupstate {
   WAKE_UP_END
 };
 enum e_rxstate {
-  init_start,
+  NONE,
+  INIT_LOOPBACK,
   init_read,
   comm_comm
 };

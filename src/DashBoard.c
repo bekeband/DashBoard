@@ -174,17 +174,14 @@ bool APP_ObjectMessageCallback( GFX_GOL_TRANSLATED_ACTION objectMessage,
       } else if ((objectMessage == GFX_GOL_BUTTON_ACTION_RELEASED) && (objID == ID_START_CONNECTION))
       {
         LEDPortsClear();
+        ClearRXBuffer();
         WakeUpECU();
-
-        WriteBuffer(INITBUF, 5);
-
+/*        WriteInit();
         __delay_ms(300);
         __delay_ms(300);
         __delay_ms(300);
         __delay_ms(300);
-
-        
-
+        tick_tack = true;*/
       } break;
     case DISPLAY_SWRESET:
  
@@ -203,7 +200,6 @@ bool APP_ObjectMessageCallback( GFX_GOL_TRANSLATED_ACTION objectMessage,
       break;
     default: break;
   };
-
 }
 
 /* Display refresh tick mesaage pruduce. */
