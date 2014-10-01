@@ -9,7 +9,7 @@
 extern unsigned int TRYING_CONN;
 
 GFX_GOL_OBJ_SCHEME  mainscheme;          // main scheme
-enum e_connect_state old_connect_state = NONE;
+enum e_connect_state old_connect_state = CONNECT_NONE;
 enum e_OBD_error OLD_OBD_ERROR = none;
 
 int number = 0;

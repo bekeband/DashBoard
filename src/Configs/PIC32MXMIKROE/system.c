@@ -192,7 +192,7 @@ void __ISR(_TIMER_3_VECTOR, ipl2) _T3Interrupt(void)
 /*********************************************************************
  * Section: Tick Delay
  *********************************************************************/
-
+/* T3 ticker 0.5 msec timer */
 #define TICK_PERIOD     (((SYS_CLK_FrequencyPeripheralGet() / 256)) / 2000)
 /* T4 ticker must be 1 msec timer. */
 #define TICK4_PERIOD    (((SYS_CLK_FrequencyPeripheralGet() / 256)) / 1000)

@@ -26,14 +26,14 @@ enum e_wakeupstate {
   WAKE_UP_END
 };
 enum e_rxstate {
-  NONE,
+  RXSTATE_NONE,
   INIT_LOOPBACK,
   init_read,
   comm_comm
 };
 
 enum e_connect_state {
-  NONE    = 0,
+  CONNECT_NONE    = 0,
   WAKE_UP = 1,
   INIT    = 2,
   WAIT_FOR_CONNECT = 3,

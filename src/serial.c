@@ -25,10 +25,17 @@ static GFX_XCHAR CONNECT_STATE_STRINGS[] = {"none\0wake up\0init\0wait for conne
 enum e_rxstate RX_STATE_MODE;
 enum e_OBD_error OBD_ERROR = none;
 enum e_wakeupstate WAKE_UP_STATE = WAKE_UP_STAND_BY;
-enum e_connect_state CONNECT_STATE = NONE;
+enum e_connect_state CONNECT_STATE = CONNECT_NONE;
 
 enum e_connect_state GetConnectState() {return CONNECT_STATE;};
 enum e_OBD_error GetErrorState() {return OBD_ERROR;};
+
+/* Wake UP ECU for slow, or fast init procedure. */
+
+/*void WakeUpECU()
+{
+  CONNECT_STATE = WAKE_UP;
+}*/
 
 void WakeUpECU()
 { 
@@ -39,9 +46,9 @@ void WakeUpECU()
   __delay_ms(300);
   __delay_ms(300);
   TXLAT = 1;
-  __delay_ms(25);
+  __delay_ms(WKUP_INPULSE_TIME_01);
   TXLAT = 0;
-  __delay_ms(25);
+  __delay_ms(WKUP_INPULSE_TIME_02);
   EnableUART1();
   CONNECT_STATE = INIT;
 }
@@ -78,8 +85,7 @@ void InitUART1()
 {
 #ifdef TEST_MODE
   UARTConfigure(UART_MODULE_ID, UART_ENABLE_PINS_TX_RX_ONLY | UART_INVERT_TRANSMIT_POLARITY | 
-      UART_INVERT_RECEIVE_POLARITY);
-  //| UART_ENABLE_LOOPBACK);
+      UART_INVERT_RECEIVE_POLARITY | UART_ENABLE_LOOPBACK);
 #else
   UARTConfigure(UART_MODULE_ID, UART_ENABLE_PINS_TX_RX_ONLY | UART_INVERT_TRANSMIT_POLARITY |
       UART_INVERT_RECEIVE_POLARITY);
@@ -132,7 +138,7 @@ int WriteBuffer(const char *buffer, int size)
 
 #ifndef TEST_MODE
      /*  */
-//     UARTEnable(UART_MODULE_ID, UART_DISABLE_FLAGS(UART_RX));
+     UARTEnable(UART_MODULE_ID, UART_DISABLE_FLAGS(UART_RX));
 #endif
 
 
@@ -144,11 +150,11 @@ for (i = 0; i < size; i++)
 
     buffer++;
 
-//    while(!UARTTransmissionHasCompleted(UART_MODULE_ID)) ;
+    while(!UARTTransmissionHasCompleted(UART_MODULE_ID)) ;
   }
 
 #ifndef TEST_MODE
-//     UARTEnable(UART_MODULE_ID, UART_ENABLE_FLAGS(UART_RX));
+     UARTEnable(UART_MODULE_ID, UART_ENABLE_FLAGS(UART_RX));
 #endif
 
 return i;
@@ -183,7 +189,6 @@ int CheckConnection(uint8_t* buffer)
   } else return -1;
 }
 
-#define BUFFER_TEST_MODE
 
 /* Serial interrupt program for RX characters. */
 
@@ -193,30 +198,16 @@ void __ISR(_UART_1_VECTOR, ipl2) IntUart1Handler(void)
 	// Is this an RX interrupt?
 	if(INTGetFlag(INT_SOURCE_UART_RX(UART_MODULE_ID)))
 	{
-    if (RXBUFFER_PTR < RX_BUFFER_SIZE)
-    {
-      RXBUFFER[RXBUFFER_PTR++] = U1RXREG;
-      switch (RX_STATE_MODE)
-      { /* INIT_LOOPBACK */
-        case INIT_LOOPBACK:
-        { /* LOOPBACK THE ALL INIT BYTES??? */
-          if (RXBUFFER_PTR == SEND_DATA_SIZE)
-          {
-
-          }
-        }break;
-      }
-    };
 
 #ifdef BUFFER_TEST_MODE
 
-/*    if (RXBUFFER_PTR < RX_BUFFER_SIZE)
+    if (RXBUFFER_PTR < RX_BUFFER_SIZE)
     {
       RXBUFFER[RXBUFFER_PTR++] = U1RXREG;
     } else
     {
       RXBUFFER_PTR = 0;
-    }*/
+    }
 #else
 
     if (RXBUFFER_PTR < RX_BUFFER_SIZE)
@@ -305,12 +296,6 @@ void WriteInit()
   isize = WriteBuffer(TXBUFFER, SEND_DATA_SIZE);
 }
 
-/* Wake UP ECU for slow, or fast init procedure. */
-
-/*void WakeUpECU()
-{
-  CONNECT_STATE = WAKE_UP;
-}*/
 
 /* We'll use the T4 timer for overtime measuring the incoming packets. */
 
@@ -320,7 +305,7 @@ void __ISR(_TIMER_4_VECTOR, ipl2) Timer4Handler(void)
 {
   switch (CONNECT_STATE)
   { /* switch connect_state */
-    case NONE:
+    case CONNECT_NONE:
     {
       
     } break;
@@ -384,29 +369,22 @@ void __ISR(_TIMER_4_VECTOR, ipl2) Timer4Handler(void)
     {
       if (T4_TICK_TACK++ > CONNECT_OVERTIME)
       {
-        CONNECT_STATE = NONE;
+        CONNECT_STATE = CONNECT_NONE;
         OBD_ERROR = wait_for_con_timeout;
       }
     }break;
 
-    case LOOPBACK_OK:
+/*    case LOOPBACK_OK:
     {
 
-    }break;
+    }break;*/
 
     /* This state give in the timer4 UART1RX interrupt, when read the connection string. */
     case DATACHANGE:
     {
-#ifndef TEST_MODE
-     /*  */
-     UARTEnable(UART_MODULE_ID, UART_ENABLE_FLAGS(UART_PERIPHERAL | UART_TX));
-#endif
-      T4_TICK_TACK = 0;
-      WriteGetPIDs();
-#ifndef TEST_MODE
-     UARTEnable(UART_MODULE_ID, UART_ENABLE_FLAGS(UART_PERIPHERAL | UART_RX));
-#endif
       LED_RED_01_LAT() = 1;
+      T4_TICK_TACK = 0;
+//      WriteGetPIDs();
       CONNECT_STATE = WAIT_FOR_HEARTBEAT;
     } break;
 
@@ -414,7 +392,7 @@ void __ISR(_TIMER_4_VECTOR, ipl2) Timer4Handler(void)
     {
       if (T4_TICK_TACK++ > HEARTBEAT_OVERTIME)
       {
-        CONNECT_STATE = NONE;
+        CONNECT_STATE = CONNECT_NONE;
         OBD_ERROR = heartbeat_overtime;
       } break;
 

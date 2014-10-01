@@ -176,8 +176,8 @@ bool APP_ObjectMessageCallback( GFX_GOL_TRANSLATED_ACTION objectMessage,
         LEDPortsClear();
         ClearRXBuffer();
         WakeUpECU();
-/*        WriteInit();
-        __delay_ms(300);
+//        WriteInit();
+/*        __delay_ms(300);
         __delay_ms(300);
         __delay_ms(300);
         __delay_ms(300);
