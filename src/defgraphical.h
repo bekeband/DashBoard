@@ -14,6 +14,7 @@ extern const GFX_GOL_OBJ_SCHEME GOLSchemeDefault;
 #define ID_MAIN         51
 #define ID_OPTIONS      52
 
+
 #define MAIN_WINDOW     60
 #define CONNECT_TERMINAL   61
 #define ERROR_TERMINAL    62
@@ -30,6 +31,8 @@ extern const GFX_GOL_OBJ_SCHEME GOLSchemeDefault;
 #define ID_RADIOBUTTON2   103
 #define ID_RADIOBUTTON3   104
 #define ID_START_CONNECTION     105
+#define ID_GETPID_COMM    200
+#define ID_GETPID_2_COMM    201
 
 /* Test K-Line button */
 #define ID_TESTKLINE_BUT      106

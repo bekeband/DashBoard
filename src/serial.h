@@ -39,6 +39,8 @@ enum e_connect_state {
   WAIT_FOR_CONNECT = 3,
   DATACHANGE  = 4,
   WAIT_FOR_HEARTBEAT = 5,
+  GET_HEARTBEAT = 6,
+  HEARTBEAT_IDLE = 7,
   DSP_NONE = -1
 };
 
@@ -72,7 +74,9 @@ struct s_ask_packet{
 /* Wait for connect. This is the overtime to wait is msec. */
 #define CONNECT_OVERTIME  4000
 /* HEARTBEAT_OVERTIME */
-#define HEARTBEAT_OVERTIME  400
+#define HEARTBEAT_OVERTIME  1400
+/* Waiting between for two heartbeat. */
+#define HEARTBEAT_IDLE  400
 
 #define PRE_DELAY_TIME  1000
 #define WKUP_INPULSE_TIME_01  25
@@ -90,13 +94,29 @@ struct s_ask_packet{
 #define START_COMM_REQ  0x81
 #define KEY_ISO14230_4  0x8FE9
 #define SERVICE_01      0x01
-#define PID_00          0x00
+
+
+
+#define PID_PIDS_SUPPORTED_LOW      0x00
+#define PID_MONITOR_STAT            0x01
+#define PID_FREEZE_DTC              0x02
+#define PID_FUEL_SYSTEM_STATUS      0x03
+#define PID_CALC_ENGINE_LOAD        0x04
+#define PID_COOLANT_TEMP            0x05
+#define PID_SHORT_FUEL_BANK_1       0x06
+#define PID_LONG_FUEL_BANK_1        0x07
+#define PID_SHORT_FUEL_BANK_2       0x08
+#define PID_LONG_FUEL_BANK_2        0x09
+#define PID_FUEL_PRESSURE           0x0A
+
+#define PID_PIDS_SUPPORTED_HIGH     0x20
 
 void InitUART1();
 void WriteString(const char *string);
 int WriteBuffer(const char *buffer, int size);
 void DisableUART1();
 void EnableUART1();
+void WriteGetPIDs();
 
 #ifdef DEBUG_TERMINAL
 int GetRXBufferInHex(char* string, int max_size);
@@ -106,17 +126,35 @@ void ClearRXBuffer();
 uint8_t CRCMake(int size, uint8_t* buffer);
 
 void WakeUpECU();
+int ConnectECU();
 
 void WriteInit();
 void WriteGetPIDs();
+void WriteGetPID2s();
+void WriteGetPID(uint8_t PIDADDR);
 
 enum e_connect_state GetConnectState();
 enum e_OBD_error GetErrorState();
+
+void SetConnectState(enum e_connect_state newstate);
 
 GFX_XCHAR* GetConnectStateString();
 GFX_XCHAR* GetOBDErrorString();
 
 
+/* PID ask structure for pid request. */
+struct s_PID_ASK
+{
+  /* Own the PID code, whitch must be send to ECU. */
+  uint8_t PID_CODE;
+  /* Size of the expected return value(s).*/
+  uint8_t return_size;
+};
 
+#define READ_OVERTIME   -1
+#define READ_OK         0
+
+#define ANSWER_OVERTIME -1
+#define ANSWER_OK       0
 
 #endif

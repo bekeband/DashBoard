@@ -42,6 +42,31 @@ uint16_t CreateStartButton(void)
     return 1;
 }
 
+uint16_t CreateGETPIDButton(void)
+{
+  GFX_GOL_BUTTON *pObj;
+  pObj = GFX_GOL_ButtonCreate ( ID_GETPID_COMM, 220, 164, 300, 190, 0,
+    GFX_GOL_BUTTON_DRAW_STATE, NULL, NULL, "GET PID",
+    GFX_ALIGN_HCENTER | GFX_ALIGN_VCENTER, &MAIN_SCHEME );
+
+    if(pObj == NULL)
+        return (0);
+    return 1;
+}
+
+uint16_t CreateGETPID2Button(void)
+{
+  GFX_GOL_BUTTON *pObj;
+  pObj = GFX_GOL_ButtonCreate ( ID_GETPID_2_COMM, 220, 114, 300, 150, 0,
+    GFX_GOL_BUTTON_DRAW_STATE, NULL, NULL, "GET PID2",
+    GFX_ALIGN_HCENTER | GFX_ALIGN_VCENTER, &MAIN_SCHEME );
+
+    if(pObj == NULL)
+        return (0);
+    return 1;
+}
+
+
 /***************************************************
  * MainScreenCreate(void) Create the application main screen in default scheme.
  * in default scheme.
@@ -57,6 +82,9 @@ void MainScreenCreate(void)
   {
     if (!CreateStartButton()) ErrorCreate(0);
   }
+
+  if (!CreateGETPIDButton()) ErrorCreate(0);
+  if (!CreateGETPID2Button()) ErrorCreate(0);
 
   pSt = GFX_GOL_StaticTextCreate (
         CONNECT_TERMINAL,                  // ID

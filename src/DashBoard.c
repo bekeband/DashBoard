@@ -46,18 +46,7 @@ typedef enum
   DISPLAY_SWRESET,
 } APP_SCREEN_STATES;
 
-/*typedef enum
-{
-  INIT,
-  START
-} CONNECT_STATES;*/
-
 APP_SCREEN_STATES   screenState;
-//CONNECT_STATES      connectState;
-
-/* APP_createMainButton(void)
- * Create main button for main screen reach at all program state.
-*/
 
 // *****************************************************************************
 uint16_t APP_CreateMainButton(void)
@@ -120,6 +109,7 @@ bool APP_ObjectDrawCallback(void)
       GFX_ColorSet(BLUE);
       GFX_ScreenClear();
       APP_CreateMainButton();
+
       CreateOptions();
       screenState = DISPLAY_OPTIONS;
       break;
@@ -145,8 +135,9 @@ bool APP_ObjectDrawCallback(void)
    return true;
 };
 
-static uint8_t INITBUF[5] = {INIT_FORMAT_BYTE, TARGET_ADDR, TESTER_ADDR, START_COMM_REQ, 0x66};
-
+//static uint8_t INITBUF[5] = {INIT_FORMAT_BYTE, TARGET_ADDR, TESTER_ADDR, START_COMM_REQ, 0x66};
+static int GP_0 = 0x20;
+static int GPMUL = 0;
 
 bool APP_ObjectMessageCallback( GFX_GOL_TRANSLATED_ACTION objectMessage,
   GFX_GOL_OBJ_HEADER* pObject, GFX_GOL_MESSAGE* pMessage)
@@ -176,13 +167,31 @@ bool APP_ObjectMessageCallback( GFX_GOL_TRANSLATED_ACTION objectMessage,
         LEDPortsClear();
         ClearRXBuffer();
         WakeUpECU();
+        if (GetConnect() == ANSWER_OK)
+        {
+          SetConnectState(DATACHANGE);
+        } else
+        {
+          SetConnectState(WAIT_FOR_HEARTBEAT);
+        }
+
+//        ConnectECU();
 //        WriteInit();
 /*        __delay_ms(300);
         __delay_ms(300);
         __delay_ms(300);
         __delay_ms(300);
         tick_tack = true;*/
-      } break;
+      } else if ((objectMessage == GFX_GOL_BUTTON_ACTION_RELEASED) && (objID == ID_GETPID_COMM))
+      {
+        ClearRXBuffer();
+        WriteGetPID(GP_0 * (GPMUL++));
+      }/*else if ((objectMessage == GFX_GOL_BUTTON_ACTION_RELEASED) && (objID == ID_GETPID_2_COMM))
+      {
+        ClearRXBuffer();
+        WriteGetPID2s();
+      }*/
+      break;
     case DISPLAY_SWRESET:
  
     case DISPLAY_OPTIONS:

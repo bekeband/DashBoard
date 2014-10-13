@@ -6,6 +6,7 @@
 static uint8_t TXBUFFER[TX_BUFFER_SIZE];
 uint8_t RXBUFFER[RX_BUFFER_SIZE];
 int SEND_DATA_SIZE;
+int BUFFER_TEST_MODE = 0;
 
 int TXBUFFER_PTR;
 int RXBUFFER_PTR;
@@ -17,10 +18,12 @@ uint8_t ECU_ADDR;
 /* Keyword variable. */
 uint16_t KEYWORD;
 
+//static s_PID_ASK
+
 static GFX_XCHAR ERRORSTRINGS[] = {"none\0timeout\0CRC error\0invalid answer\0invalid keyword\0rxbuffer full\0wait for conn timeout\0"\
 "heartbeat overtime\0connection error\0"};
 
-static GFX_XCHAR CONNECT_STATE_STRINGS[] = {"none\0wake up\0init\0wait for connect\0datachange\0wait for heartbeat\0"};
+static GFX_XCHAR CONNECT_STATE_STRINGS[] = {"none\0wake up\0init\0wait for connect\0datachange\0wait for heartbeat\0heartbreak OK\0heartbeat idle"};
 
 enum e_rxstate RX_STATE_MODE;
 enum e_OBD_error OBD_ERROR = none;
@@ -31,6 +34,8 @@ enum e_connect_state GetConnectState() {return CONNECT_STATE;};
 enum e_OBD_error GetErrorState() {return OBD_ERROR;};
 
 /* Wake UP ECU for slow, or fast init procedure. */
+
+void SetConnectState(enum e_connect_state newstate) {CONNECT_STATE = newstate;};
 
 /*void WakeUpECU()
 {
@@ -50,7 +55,13 @@ void WakeUpECU()
   TXLAT = 0;
   __delay_ms(WKUP_INPULSE_TIME_02);
   EnableUART1();
-  CONNECT_STATE = INIT;
+//  CONNECT_STATE = INIT;
+}
+
+int ConnectECU()
+{
+  WakeUpECU();
+  WriteInit();
 }
 
 GFX_XCHAR* GetStringANumber(const GFX_XCHAR* buffer, int hownum)
@@ -74,6 +85,7 @@ GFX_XCHAR* GetOBDErrorString()
 
 void ClearRXBuffer()
 { int i;
+  U1STAbits.OERR = 0;
   RXBUFFER_PTR = 0;
   for (i = 0; i < RX_BUFFER_SIZE; i++)
   {
@@ -95,7 +107,8 @@ void InitUART1()
   UARTSetDataRate(UART_MODULE_ID, GetPeripheralClock(), DESIRED_BAUDRATE);
   UARTEnable(UART_MODULE_ID, UART_ENABLE_FLAGS(UART_PERIPHERAL | UART_RX | UART_TX));
 
-  INTEnable(INT_SOURCE_UART_RX(UART_MODULE_ID), INT_ENABLED);
+  /* TODO RX interrupt not enabled !!! */
+//  INTEnable(INT_SOURCE_UART_RX(UART_MODULE_ID), INT_ENABLED);
 //  INTEnable(INT_SOURCE_UART_TX(UART_MODULE_ID), INT_ENABLED);
   INTSetVectorPriority(INT_VECTOR_UART(UART_MODULE_ID), INT_PRIORITY_LEVEL_2);
   INTSetVectorSubPriority(INT_VECTOR_UART(UART_MODULE_ID), INT_SUB_PRIORITY_LEVEL_2);
@@ -138,9 +151,8 @@ int WriteBuffer(const char *buffer, int size)
 
 #ifndef TEST_MODE
      /*  */
-     UARTEnable(UART_MODULE_ID, UART_DISABLE_FLAGS(UART_RX));
+//     UARTEnable(UART_MODULE_ID, UART_DISABLE_FLAGS(UART_RX));
 #endif
-
 
 for (i = 0; i < size; i++)
   {
@@ -154,7 +166,7 @@ for (i = 0; i < size; i++)
   }
 
 #ifndef TEST_MODE
-     UARTEnable(UART_MODULE_ID, UART_ENABLE_FLAGS(UART_RX));
+//     UARTEnable(UART_MODULE_ID, UART_ENABLE_FLAGS(UART_RX));
 #endif
 
 return i;
@@ -199,16 +211,17 @@ void __ISR(_UART_1_VECTOR, ipl2) IntUart1Handler(void)
 	if(INTGetFlag(INT_SOURCE_UART_RX(UART_MODULE_ID)))
 	{
 
-#ifdef BUFFER_TEST_MODE
-
+if (BUFFER_TEST_MODE)
+{
     if (RXBUFFER_PTR < RX_BUFFER_SIZE)
     {
       RXBUFFER[RXBUFFER_PTR++] = U1RXREG;
     } else
     {
       RXBUFFER_PTR = 0;
-    }
-#else
+    }  
+} else
+{
 
     if (RXBUFFER_PTR < RX_BUFFER_SIZE)
     {
@@ -226,6 +239,8 @@ void __ISR(_UART_1_VECTOR, ipl2) IntUart1Handler(void)
             {
               /* Have been running the data change with ECU. */
               CONNECT_STATE = DATACHANGE;
+              /* Clear RXBUFFER to receive further datas. */
+              ClearRXBuffer();
               LED_RED_02_LAT() = 1;
             }
           } else
@@ -242,11 +257,12 @@ void __ISR(_UART_1_VECTOR, ipl2) IntUart1Handler(void)
       OBD_ERROR = rxbuffer_full;
       RXBUFFER_PTR = 0;
     }
-#endif
+}
     // Clear the RX interrupt Flag
 	  INTClearFlag(INT_SOURCE_UART_RX(UART_MODULE_ID));
 
 	}
+
 }
 
 void DisableUART1()
@@ -265,11 +281,38 @@ void WriteGetPIDs()
   TXBUFFER[1] = TARGET_ADDR;
   TXBUFFER[2] = TESTER_ADDR;
   TXBUFFER[3] = SERVICE_01;
-  TXBUFFER[4] = PID_00;
+  TXBUFFER[4] = PID_PIDS_SUPPORTED_LOW;
   TXBUFFER[5] = CRCMake(5, TXBUFFER);
   SEND_DATA_SIZE = 6;
   ClearRXBuffer();
   WriteBuffer(TXBUFFER, SEND_DATA_SIZE);
+}
+
+void WriteGetPID2s()
+{
+  TXBUFFER[0] = PID_FORMAT_BYTE;
+  TXBUFFER[1] = TARGET_ADDR;
+  TXBUFFER[2] = TESTER_ADDR;
+  TXBUFFER[3] = SERVICE_01;
+  TXBUFFER[4] = PID_PIDS_SUPPORTED_HIGH;
+  TXBUFFER[5] = CRCMake(5, TXBUFFER);
+  SEND_DATA_SIZE = 6;
+  ClearRXBuffer();
+  WriteBuffer(TXBUFFER, SEND_DATA_SIZE);
+}
+
+void WriteGetPID(uint8_t PIDADDR)
+{
+  TXBUFFER[0] = PID_FORMAT_BYTE;
+  TXBUFFER[1] = TARGET_ADDR;
+  TXBUFFER[2] = TESTER_ADDR;
+  TXBUFFER[3] = SERVICE_01;
+  TXBUFFER[4] = PIDADDR;
+  TXBUFFER[5] = CRCMake(5, TXBUFFER);
+  SEND_DATA_SIZE = 6;
+//  ClearRXBuffer();
+  WriteBuffer(TXBUFFER, SEND_DATA_SIZE);
+  ClearRXBuffer();
 }
 
 void WriteInit()
@@ -290,12 +333,50 @@ void WriteInit()
   TXBUFFER[5] = 0x8F;
   TXBUFFER[6] = CRCMake(6, TXBUFFER);
   SEND_DATA_SIZE = 7;
-
 #endif
-  ClearRXBuffer();
   isize = WriteBuffer(TXBUFFER, SEND_DATA_SIZE);
 }
 
+int GetConnect()
+{
+  WriteInit();
+  ClearRXBuffer();
+  return GetAnswer(INIT_RESPOND_SIZE, 1000);
+}
+
+int GetAnswer(int answer_size, int overtime)
+{ int i = 0; UART_DATA data;
+  for (i = 0; (i < answer_size) ; i++)
+  {
+    if (GetSerialByte(overtime) == READ_OK)
+    {
+      data = UARTGetData(UART1);
+      RXBUFFER[i++] == data.data8bit;
+    }
+    else return ANSWER_OVERTIME;
+  }
+
+  return ANSWER_OK;
+
+/*  while ((i < answer_size) && ((UARTReceivedDataIsAvailable (UART_MODULE_ID) || ((GetTickValue() < overtime)))))
+  {
+    RXBUFFER[i++] == UARTGetData(UART1);
+  }*/
+}
+
+int GetSerialByte(int overtime)
+{
+  /* reset the TIMER_3 ticker to overtime measuring. */
+  ResetTick();
+  while (!UARTReceivedDataIsAvailable(UART_MODULE_ID))
+  {
+    if (GetTickValue() > overtime)
+    {
+      return  READ_OVERTIME;
+    }
+  };
+  return READ_OK;
+}
 
 /* We'll use the T4 timer for overtime measuring the incoming packets. */
 
@@ -386,18 +467,32 @@ void __ISR(_TIMER_4_VECTOR, ipl2) Timer4Handler(void)
       T4_TICK_TACK = 0;
 //      WriteGetPIDs();
       CONNECT_STATE = WAIT_FOR_HEARTBEAT;
+      BUFFER_TEST_MODE = 1;
     } break;
 
     case WAIT_FOR_HEARTBEAT:
     {
-      if (T4_TICK_TACK++ > HEARTBEAT_OVERTIME)
+/*      if (T4_TICK_TACK++ > HEARTBEAT_OVERTIME)
       {
         CONNECT_STATE = CONNECT_NONE;
         OBD_ERROR = heartbeat_overtime;
-      } break;
+      };*/
 
     } break;
-
+    /* We get PID datas from ECU... */
+    case GET_HEARTBEAT:
+    {
+      T4_TICK_TACK = 0;
+      CONNECT_STATE = HEARTBEAT_IDLE;
+    }break;
+    
+    case HEARTBEAT_IDLE:
+    {
+      if (T4_TICK_TACK++ > HEARTBEAT_IDLE)
+      {
+        CONNECT_STATE = DATACHANGE;
+      }
+    }break;
     }
   }
 
@@ -405,7 +500,7 @@ void __ISR(_TIMER_4_VECTOR, ipl2) Timer4Handler(void)
 }
 
 #ifdef DEBUG_TERMINAL
-int GetRXBufferInHex(char* string, int max_size)
+int GetRXBufferInHex(char* string, int size)
   {
   sprintf(string, "%2x %2x %2x %2x %2x %2x %2x %2x %2x %2x %2x %2x %2x %2x %2x %2x",
       RXBUFFER[0], RXBUFFER[1], RXBUFFER[2] ,RXBUFFER[3], RXBUFFER[4], RXBUFFER[5], RXBUFFER[6], RXBUFFER[7],
