@@ -22,12 +22,6 @@
 
 extern GFX_XCHAR* TerminalBuffer;
 
-/* Tree protocols :
- * 1. ISO 9141 with 5 baud initialization (init)
- * 2. KWP with 5 baud init.
- * 3. KWP with fast init.
- */
-
 /* tick_tack variable for ticken. */
 bool tick_tack;
 
@@ -165,16 +159,15 @@ bool APP_ObjectMessageCallback( GFX_GOL_TRANSLATED_ACTION objectMessage,
       } else if ((objectMessage == GFX_GOL_BUTTON_ACTION_RELEASED) && (objID == ID_START_CONNECTION))
       {
         LEDPortsClear();
-        ClearRXBuffer();
-        WakeUpECU();
-        if (GetConnect() == ANSWER_OK)
+        ConnectECU();
+/*        if (GetConnect() == ANSWER_OK)
         {
           SetConnectState(DATACHANGE);
+          tick_tack = true;
         } else
         {
-          SetConnectState(WAIT_FOR_HEARTBEAT);
-        }
-
+          SetConnectState(CONNECT_NONE);
+        }*/
 //        ConnectECU();
 //        WriteInit();
 /*        __delay_ms(300);
@@ -182,10 +175,17 @@ bool APP_ObjectMessageCallback( GFX_GOL_TRANSLATED_ACTION objectMessage,
         __delay_ms(300);
         __delay_ms(300);
         tick_tack = true;*/
+        
       } else if ((objectMessage == GFX_GOL_BUTTON_ACTION_RELEASED) && (objID == ID_GETPID_COMM))
       {
-        ClearRXBuffer();
-        WriteGetPID(GP_0 * (GPMUL++));
+        tick_tack = true;
+        if (GetECUData(MakeGetPIDBuffer(0), READ_CHAR_OVERTIME))
+        {
+          SetConnectState(GET_HEARTBEAT);
+        } else
+        {
+          SetConnectState(CONNECT_NONE);
+        }
       }/*else if ((objectMessage == GFX_GOL_BUTTON_ACTION_RELEASED) && (objID == ID_GETPID_2_COMM))
       {
         ClearRXBuffer();
@@ -272,7 +272,13 @@ int main(int argc, char** argv) {
           if (msg.uiEvent == EVENT_INVALID)
           {
 //            SerialGetMessage(&msg);
-            TickGetMessage(&msg);
+            if (ReceivedData)
+            {
+              ReceivedData = 0;
+              msg.type = TYPE_TIMER;
+              msg.uiEvent = EVENT_SET;
+            }
+            //TickGetMessage(&msg);
           }
           GFX_GOL_ObjectMessage(&msg);      // Process message
         }

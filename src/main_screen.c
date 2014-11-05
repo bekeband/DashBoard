@@ -26,7 +26,6 @@ void SetMainScheme()
     MAIN_SCHEME.CommonBkTop = 0;  // vertical starting position of the background
     MAIN_SCHEME.CommonBkType = GFX_BACKGROUND_COLOR;
     MAIN_SCHEME.pFont = (GFX_RESOURCE_HDR*)&APP_DEMO_FONT;
-
 }
 
 

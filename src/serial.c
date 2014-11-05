@@ -5,11 +5,23 @@
 
 static uint8_t TXBUFFER[TX_BUFFER_SIZE];
 uint8_t RXBUFFER[RX_BUFFER_SIZE];
+//static UART_DATA TXBUFFERU[TX_BUFFER_SIZE];
+//UART_DATA RXBUFFERU[RX_BUFFER_SIZE];
 int SEND_DATA_SIZE;
-int BUFFER_TEST_MODE = 0;
+int BUFFER_TEST_MODE = 1;
+int IsSizeByte = 0;
+int datasize;
+
+int SEND_DATA_SIZE;
+int REC_DATA_SIZE;
+
+int ReceivedData = 0;
 
 int TXBUFFER_PTR;
 int RXBUFFER_PTR;
+
+/* Sucessfully sended packet (packet ID.) */
+long PacketSended = 0;
 
 /* Next response data size. */
 uint8_t data_size;
@@ -23,12 +35,13 @@ uint16_t KEYWORD;
 static GFX_XCHAR ERRORSTRINGS[] = {"none\0timeout\0CRC error\0invalid answer\0invalid keyword\0rxbuffer full\0wait for conn timeout\0"\
 "heartbeat overtime\0connection error\0"};
 
-static GFX_XCHAR CONNECT_STATE_STRINGS[] = {"none\0wake up\0init\0wait for connect\0datachange\0wait for heartbeat\0heartbreak OK\0heartbeat idle"};
+static GFX_XCHAR CONNECT_STATE_STRINGS[] = {"none\0wake up\0init\0wait for connect\0datachange\0wait for heartbeat\0heartbreak OK\0heartbeat \
+idle\0getpid state"};
 
 enum e_rxstate RX_STATE_MODE;
 enum e_OBD_error OBD_ERROR = none;
 enum e_wakeupstate WAKE_UP_STATE = WAKE_UP_STAND_BY;
-enum e_connect_state CONNECT_STATE = CONNECT_NONE;
+enum e_connect_state CONNECT_STATE = DSP_NONE; // CONNECT_NONE;
 
 enum e_connect_state GetConnectState() {return CONNECT_STATE;};
 enum e_OBD_error GetErrorState() {return OBD_ERROR;};
@@ -84,13 +97,15 @@ GFX_XCHAR* GetOBDErrorString()
 }
 
 void ClearRXBuffer()
-{ int i;
+{
+  if (UARTReceivedDataIsAvailable(UART_MODULE_ID))
+    UARTGetData(UART_MODULE_ID);
   U1STAbits.OERR = 0;
   RXBUFFER_PTR = 0;
-  for (i = 0; i < RX_BUFFER_SIZE; i++)
+/*  for (i = 0; i < RX_BUFFER_SIZE; i++)
   {
     RXBUFFER[i] = 0;
-  }
+  }*/
 }
 
 void InitUART1()
@@ -105,11 +120,11 @@ void InitUART1()
   UARTSetFifoMode(UART_MODULE_ID, UART_INTERRUPT_ON_TX_NOT_FULL | UART_INTERRUPT_ON_RX_NOT_EMPTY);
   UARTSetLineControl(UART_MODULE_ID, UART_DATA_SIZE_8_BITS | UART_PARITY_NONE | UART_STOP_BITS_1);
   UARTSetDataRate(UART_MODULE_ID, GetPeripheralClock(), DESIRED_BAUDRATE);
-  UARTEnable(UART_MODULE_ID, UART_ENABLE_FLAGS(UART_PERIPHERAL | UART_RX | UART_TX));
+  UARTEnable(UART_MODULE_ID, UART_ENABLE_FLAGS(UART_PERIPHERAL));
 
   /* TODO RX interrupt not enabled !!! */
-//  INTEnable(INT_SOURCE_UART_RX(UART_MODULE_ID), INT_ENABLED);
-//  INTEnable(INT_SOURCE_UART_TX(UART_MODULE_ID), INT_ENABLED);
+  INTEnable(INT_SOURCE_UART_RX(UART_MODULE_ID), INT_ENABLED);
+  INTEnable(INT_SOURCE_UART_TX(UART_MODULE_ID), INT_ENABLED);
   INTSetVectorPriority(INT_VECTOR_UART(UART_MODULE_ID), INT_PRIORITY_LEVEL_2);
   INTSetVectorSubPriority(INT_VECTOR_UART(UART_MODULE_ID), INT_SUB_PRIORITY_LEVEL_2);
   ClearRXBuffer();
@@ -125,6 +140,18 @@ void PutCharacter(const char character)
 
         while(!UARTTransmissionHasCompleted(UART_MODULE_ID))
             ;
+}
+
+void RXSimplex()
+{
+  UARTEnable(UART_MODULE_ID, UART_DISABLE_FLAGS(UART_TX));
+  UARTEnable(UART_MODULE_ID, UART_ENABLE_FLAGS(UART_RX));
+}
+
+void TXSimplex()
+{
+  UARTEnable(UART_MODULE_ID, UART_DISABLE_FLAGS(UART_RX));
+  UARTEnable(UART_MODULE_ID, UART_ENABLE_FLAGS(UART_TX));
 }
 
 // Helper functions
@@ -144,6 +171,13 @@ void WriteString(const char *string)
         while(!UARTTransmissionHasCompleted(UART_MODULE_ID)) ;
     }
 //  PORTDbits.RD0 = 1;
+}
+/* Asyncronious serial write */
+WriteBufferAsync(const char* buffer, int size)
+{
+  memcpy(TXBUFFER, buffer, size);
+  SEND_DATA_SIZE = size;
+  TXSimplex();
 }
 
 int WriteBuffer(const char *buffer, int size)
@@ -202,20 +236,61 @@ int CheckConnection(uint8_t* buffer)
 }
 
 
+void StartOvertimeTicker()
+{
+}
+
+void ResetOvertimeTicker()
+{
+}
+
+
 /* Serial interrupt program for RX characters. */
 
 void __ISR(_UART_1_VECTOR, ipl2) IntUart1Handler(void)
 {
+  UART_DATA data;
 
 	// Is this an RX interrupt?
 	if(INTGetFlag(INT_SOURCE_UART_RX(UART_MODULE_ID)))
 	{
 
-if (BUFFER_TEST_MODE)
+    INTClearFlag(INT_SOURCE_UART_RX(UART_MODULE_ID));
+    //    if (IsEcho) return;
+
+    if (!IsSizeByte)
+    {
+      data = UARTGetData(UART_MODULE_ID);
+      RXBUFFER[RXBUFFER_PTR++] = data.data8bit;
+      datasize = data.data8bit & 0b00111111;
+      if (!(((datasize >= MIN_ANSWER_SIZE) && (datasize <= MAX_ANSWER_SIZE))))
+      {
+        /* Bad data size. */
+      } else
+      {
+        REC_DATA_SIZE = datasize + 4;
+      }
+      IsSizeByte = 1;
+    } else
+    {
+      if (REC_DATA_SIZE--)
+      {
+        data = UARTGetData(UART_MODULE_ID);
+        RXBUFFER[RXBUFFER_PTR++] = data.data8bit;
+      } else
+      {
+        ReceivedData = 1;
+      }
+    }
+
+
+
+/*if (BUFFER_TEST_MODE)
 {
     if (RXBUFFER_PTR < RX_BUFFER_SIZE)
     {
-      RXBUFFER[RXBUFFER_PTR++] = U1RXREG;
+      data = UARTGetData(UART_MODULE_ID);
+      RXBUFFERU[RXBUFFER_PTR++] = data;
     } else
     {
       RXBUFFER_PTR = 0;
@@ -231,15 +306,13 @@ if (BUFFER_TEST_MODE)
       } else
       {
         if (CRCMake((INIT_RESPOND_SIZE - 1), RXBUFFER) == U1RXREG)
-        {/* CRC OK*/
+        {
           if (CheckConnection(RXBUFFER) > -1)
           {
             OBD_ERROR = none;
             if (CONNECT_STATE == WAIT_FOR_CONNECT)
             {
-              /* Have been running the data change with ECU. */
               CONNECT_STATE = DATACHANGE;
-              /* Clear RXBUFFER to receive further datas. */
               ClearRXBuffer();
               LED_RED_02_LAT() = 1;
             }
@@ -257,22 +330,42 @@ if (BUFFER_TEST_MODE)
       OBD_ERROR = rxbuffer_full;
       RXBUFFER_PTR = 0;
     }
-}
-    // Clear the RX interrupt Flag
-	  INTClearFlag(INT_SOURCE_UART_RX(UART_MODULE_ID));
+}*/
 
 	}
+
+  // Is this an TX interrupt?
+	if(INTGetFlag(INT_SOURCE_UART_TX(UART_MODULE_ID)))
+	{
+    INTClearFlag(INT_SOURCE_UART_TX(UART_MODULE_ID));
+    if (SEND_DATA_SIZE--)
+    {
+      data.data8bit = TXBUFFER[TXBUFFER_PTR++];
+      UARTSendDataByte(UART_MODULE_ID, data.data8bit);
+    }else
+    {
+      /* Last byte have been sending, so disable transmit, and enable receive. */
+      RXSimplex();
+      /* Increment succesfully sended the packet counter. */
+      PacketSended += 1;
+//      ReceivedData = 1;
+      /* Starting overtime ticker to measuring the answer time. */
+      StartOvertimeTicker();
+    }
+
+  }
+
 
 }
 
 void DisableUART1()
 {
-  UARTEnable(UART_MODULE_ID, UART_DISABLE_FLAGS(UART_PERIPHERAL | UART_RX | UART_TX));
+  UARTEnable(UART_MODULE_ID, UART_DISABLE_FLAGS(UART_PERIPHERAL));
 }
 
 void EnableUART1()
 {
-  UARTEnable(UART_MODULE_ID, UART_ENABLE_FLAGS(UART_PERIPHERAL | UART_RX | UART_TX));
+  UARTEnable(UART_MODULE_ID, UART_ENABLE_FLAGS(UART_PERIPHERAL));
 }
 
 void WriteGetPIDs()
@@ -301,7 +394,7 @@ void WriteGetPID2s()
   WriteBuffer(TXBUFFER, SEND_DATA_SIZE);
 }
 
-void WriteGetPID(uint8_t PIDADDR)
+int MakeGetPIDBuffer(uint8_t PIDADDR)
 {
   TXBUFFER[0] = PID_FORMAT_BYTE;
   TXBUFFER[1] = TARGET_ADDR;
@@ -309,10 +402,11 @@ void WriteGetPID(uint8_t PIDADDR)
   TXBUFFER[3] = SERVICE_01;
   TXBUFFER[4] = PIDADDR;
   TXBUFFER[5] = CRCMake(5, TXBUFFER);
-  SEND_DATA_SIZE = 6;
+  /* return with buffer size. */
+  return 6;
 //  ClearRXBuffer();
-  WriteBuffer(TXBUFFER, SEND_DATA_SIZE);
-  ClearRXBuffer();
+//  WriteBuffer(TXBUFFER, SEND_DATA_SIZE);
+//  ClearRXBuffer();
 }
 
 void WriteInit()
@@ -334,24 +428,49 @@ void WriteInit()
   TXBUFFER[6] = CRCMake(6, TXBUFFER);
   SEND_DATA_SIZE = 7;
 #endif
-  isize = WriteBuffer(TXBUFFER, SEND_DATA_SIZE);
+//  isize = WriteBuffer(TXBUFFER, SEND_DATA_SIZE);
+  WriteBufferAsync(TXBUFFER, SEND_DATA_SIZE);
 }
 
 int GetConnect()
 {
+  UARTEnable(UART_MODULE_ID, UART_DISABLE_FLAGS(UART_RX));
   WriteInit();
-  ClearRXBuffer();
-  return GetAnswer(INIT_RESPOND_SIZE, 1000);
+  UARTEnable(UART_MODULE_ID, UART_ENABLE_FLAGS(UART_RX));
+//  delay(200);
+  return GetAnswer(INIT_RESPOND_SIZE, 100);
 }
 
-int GetAnswer(int answer_size, int overtime)
-{ int i = 0; UART_DATA data;
-  for (i = 0; (i < answer_size) ; i++)
+int GetECUData(int txsize, int overtime)
+{
+  UARTEnable(UART_MODULE_ID, UART_ENABLE_FLAGS(UART_PERIPHERAL | UART_TX));
+  WriteBuffer(TXBUFFER, txsize);
+//  ClearRXBuffer();
+  UARTEnable(UART_MODULE_ID, UART_ENABLE_FLAGS(UART_PERIPHERAL | UART_TX));
+  return GetAnswer(overtime);
+}
+
+int GetAnswer(int overtime)
+{ //int i = 0;
+  UART_DATA data; int datasize;
+  RXBUFFER_PTR = 0;
+  /* Get first byte to size. */
+  if (GetSerialByte(overtime) == READ_OK)
+  {
+    data = UARTGetData(UART_MODULE_ID);
+    RXBUFFER[RXBUFFER_PTR] = data.data8bit;
+    datasize = data.data8bit & 0b00111111;
+    if (!(((datasize >= MIN_ANSWER_SIZE) && (datasize <= MAX_ANSWER_SIZE))))
+      return BAD_ANSWER_SIZE;
+  } else return ANSWER_OVERTIME;
+
+  /* more (datasize + 3) byte reading from serial line... */
+  for (RXBUFFER_PTR = 1; RXBUFFER_PTR < (datasize + 4) ; RXBUFFER_PTR++)
   {
     if (GetSerialByte(overtime) == READ_OK)
     {
-      data = UARTGetData(UART1);
-      RXBUFFER[i++] == data.data8bit;
+      data = UARTGetData(UART_MODULE_ID);
+      RXBUFFER[RXBUFFER_PTR] = data.data8bit;
     }
     else return ANSWER_OVERTIME;
   }

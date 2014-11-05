@@ -41,6 +41,7 @@ enum e_connect_state {
   WAIT_FOR_HEARTBEAT = 5,
   GET_HEARTBEAT = 6,
   HEARTBEAT_IDLE = 7,
+  GETPID_STATE = 8,
   DSP_NONE = -1
 };
 
@@ -82,6 +83,11 @@ struct s_ask_packet{
 #define WKUP_INPULSE_TIME_01  25
 #define WKUP_INPULSE_TIME_02  25
 
+#define READ_CHAR_OVERTIME  500
+
+#define MIN_ANSWER_SIZE 0
+#define MAX_ANSWER_SIZE 7
+
 /* INIT_TIMEOUT: max timeout time the init packet answer.
  (7 bytes * 2 msec.*/
 
@@ -94,8 +100,6 @@ struct s_ask_packet{
 #define START_COMM_REQ  0x81
 #define KEY_ISO14230_4  0x8FE9
 #define SERVICE_01      0x01
-
-
 
 #define PID_PIDS_SUPPORTED_LOW      0x00
 #define PID_MONITOR_STAT            0x01
@@ -140,7 +144,7 @@ void SetConnectState(enum e_connect_state newstate);
 
 GFX_XCHAR* GetConnectStateString();
 GFX_XCHAR* GetOBDErrorString();
-
+int MakeGetPIDBuffer(uint8_t PIDADDR);
 
 /* PID ask structure for pid request. */
 struct s_PID_ASK
@@ -155,6 +159,9 @@ struct s_PID_ASK
 #define READ_OK         0
 
 #define ANSWER_OVERTIME -1
+#define BAD_ANSWER_SIZE -2
 #define ANSWER_OK       0
+
+extern int ReceivedData;
 
 #endif

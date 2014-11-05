@@ -181,7 +181,7 @@ void __ISR(_TIMER_3_VECTOR, ipl2) _T3Interrupt(void)
     /* Display tick-tack flag to display refresh rate. */
     if (display_tick++ == DISPLAY_REFRESH)
     {
-      tick_tack = true;
+//      tick_tack = true;
       display_tick = 0;
     }
     /* Must be increment to delay procedure !!!!. */
@@ -207,8 +207,8 @@ void SYSTEM_TickInit(void)
   OpenTimer3(T3_ON | T3_PS_1_256, TICK_PERIOD);
   ConfigIntTimer3(T3_INT_ON | T3_INT_PRIOR_1);
 
-  OpenTimer4(T4_ON | T4_PS_1_256, TICK4_PERIOD);
-  ConfigIntTimer4(T4_INT_ON | T4_INT_PRIOR_1);
+/*  OpenTimer4(T4_ON | T4_PS_1_256, TICK4_PERIOD);
+  ConfigIntTimer4(T4_INT_ON | T4_INT_PRIOR_1);*/
 
 }
 
